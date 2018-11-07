@@ -21,6 +21,12 @@ TEST_F(TestTree, defaultConstructAndCallIsArrayReturnsFalse)
     EXPECT_FALSE(t.isArray());
 }
 
+TEST_F(TestTree, defaultConstructAndCallIsDocumentReturnsFalse)
+{
+    auto t = Json::Tree();
+    EXPECT_FALSE(t.isDocument());
+}
+
 TEST_F(TestTree, consturctFromValueAndCallIsValueReturnsTrue)
 {
     auto t = Json::Tree(Json::Value(23.0f));
@@ -260,6 +266,26 @@ TEST_F(TestTree, pushBackSeveralValuesIntoArrayAndGetWithArrayIndexReturnsSameVa
     EXPECT_FLOAT_EQ(23.5f, t[3].asFloat());
 }
 
+TEST_F(TestTree, tryToAccessArrayIndexOnEmptyTreeThrowsHelpfulError)
+{
+    auto t = Json::Tree();
+
+    EXPECT_THROW({
+        try
+        {
+            auto a = t[0];
+        }
+        catch(std::exception & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("array"));
+            EXPECT_THAT(err_msg, HasSubstr("operator[] (size_t)"));
+            EXPECT_THAT(err_msg, HasSubstr("uninitalised Tree"));
+            throw;
+        }
+    }, Json::Tree::IncorrectCallForType);
+}
+
 TEST_F(TestTree, pushBackSeveralValuesIntoArrayAndGetSize)
 {
     auto subtree_1 = Json::Tree();
@@ -481,5 +507,230 @@ TEST_F(TestTree, iterateOverArrayGivesaCorrectValuesInOrderWithEmptyStringsForKe
     EXPECT_TRUE(it->first.empty());
     EXPECT_EQ("hello", it->second.asString());
     ++it;
-    EXPECT_TRUE(it == std::cend(t));
+    EXPECT_TRUE(it == std::end(t));
+}
+
+TEST_F(TestTree, iterateOverConstArrayGivesaCorrectValuesInOrderWithEmptyStringsForKeys)
+{
+    auto t = Json::Tree();
+    t.pushBack(10);
+    t.pushBack(false);
+    t.pushBack(std::string("hello"));
+
+    auto const t_const = t;
+
+    ASSERT_TRUE(t_const.isArray());
+    ASSERT_EQ(3, t_const.size());
+
+    auto it = std::begin(t_const);
+
+    EXPECT_TRUE(it->first.empty());
+    EXPECT_EQ(10, it->second.asInteger());
+    ++it;
+    EXPECT_TRUE(it->first.empty());
+    EXPECT_FALSE(it->second.asBool());
+    ++it;
+    EXPECT_TRUE(it->first.empty());
+    EXPECT_EQ("hello", it->second.asString());
+    ++it;
+    EXPECT_TRUE(it == std::end(t_const));
+}
+
+TEST_F(TestTree,
+    iterateOverArrayWithConstIteratorsGivesaCorrectValuesInOrderWithEmptyStringsForKeys)
+{
+    auto t = Json::Tree();
+    t.pushBack(10);
+    t.pushBack(false);
+    t.pushBack(std::string("hello"));
+
+    auto const t_const = t;
+
+    ASSERT_TRUE(t_const.isArray());
+    ASSERT_EQ(3, t_const.size());
+
+    auto it = std::cbegin(t_const);
+
+    EXPECT_TRUE(it->first.empty());
+    EXPECT_EQ(10, it->second.asInteger());
+    ++it;
+    EXPECT_TRUE(it->first.empty());
+    EXPECT_FALSE(it->second.asBool());
+    ++it;
+    EXPECT_TRUE(it->first.empty());
+    EXPECT_EQ("hello", it->second.asString());
+    ++it;
+    EXPECT_TRUE(it == std::cend(t_const));
+}
+
+TEST_F(TestTree, callingBeginOnValueGivesEndIterator)
+{
+    auto t = Json::Tree("some_value");
+
+    ASSERT_TRUE(t.isValue());
+
+    auto it = std::begin(t);
+    EXPECT_TRUE(it == std::end(t));
+}
+
+TEST_F(TestTree, eraseFieldThatExistsReturns1)
+{
+    auto t = Json::Tree();
+    t["first"] = 10;
+    t["second"] = false;
+    t["third"] = std::string("hello");
+
+    ASSERT_TRUE(t.isDocument());
+    ASSERT_EQ(3, t.size());
+
+    EXPECT_EQ(1, t.erase("second"));
+}
+
+TEST_F(TestTree,
+    eraseFieldFromDocumentByFieldNameForFieldThatExistsAndIterateThroughGivesCorrectValues)
+{
+    auto t = Json::Tree();
+    t["first"] = 10;
+    t["second"] = false;
+    t["third"] = std::string("hello");
+
+    ASSERT_TRUE(t.isDocument());
+    ASSERT_EQ(3, t.size());
+
+    t.erase("second");
+
+    ASSERT_EQ(2, t.size());
+    auto it = std::begin(t);
+    EXPECT_EQ("first", it->first);
+    EXPECT_EQ(10, it->second.asInteger());
+    ++it;
+    EXPECT_EQ("third", it->first);
+    EXPECT_EQ("hello", it->second.asString());
+    ++it;
+    EXPECT_TRUE(it == std::end(t));
+}
+
+TEST_F(TestTree,
+    eraseFieldFromDocumentByFieldNameForFieldThatExistsAndGetExistingFieldsByNameGivesCorrectValues)
+{
+    auto t = Json::Tree();
+    t["first"] = 10;
+    t["second"] = false;
+    t["third"] = std::string("hello");
+
+    ASSERT_TRUE(t.isDocument());
+    ASSERT_EQ(3, t.size());
+
+    t.erase("second");
+
+    ASSERT_EQ(2, t.size());
+    EXPECT_EQ(10, t["first"].asInteger());
+    EXPECT_EQ("hello", t["third"].asString());
+}
+
+TEST_F(TestTree, eraseFieldThatDoesNotExistFromDocumentReturnsZero)
+{
+    auto t = Json::Tree();
+    t["first"] = 10;
+    t["second"] = false;
+    t["third"] = std::string("hello");
+
+    EXPECT_EQ(0, t.erase("some_field"));
+}
+
+TEST_F(TestTree, eraseFieldThatDoesNotExistFromDocumentDoesNotChangeSizeOfDocument)
+{
+    auto t = Json::Tree();
+    t["first"] = 10;
+    t["second"] = false;
+    t["third"] = std::string("hello");
+
+    ASSERT_EQ(3, t.size());
+
+    t.erase("some_field");
+
+    EXPECT_EQ(3, t.size());
+}
+
+TEST_F(TestTree,
+    eraseFieldThatDoesNotExistFromDocumentDoesNotChangeExistingValuesWhenAccessedByFieldName)
+{
+    auto t = Json::Tree();
+    t["first"] = 10;
+    t["second"] = false;
+    t["third"] = std::string("hello");
+
+    ASSERT_TRUE(t.isDocument());
+    ASSERT_EQ(3, t.size());
+
+    t.erase("some_field");
+
+    EXPECT_EQ(10, t["first"].asInteger());
+    EXPECT_FALSE(t["second"].asBool());
+    EXPECT_EQ("hello", t["third"].asString());
+}
+
+TEST_F(TestTree,
+    eraseFieldFromDocumentAndInsertTheSameFieldAndAccessAllFieldsByFieldNameGivesorrectValues)
+{
+    auto t = Json::Tree();
+    t["first"] = 10;
+    t["second"] = false;
+    t["third"] = std::string("hello");
+
+    ASSERT_TRUE(t.isDocument());
+    ASSERT_EQ(3, t.size());
+
+    t.erase("second");
+    t["second"] = 23.5f;
+
+    EXPECT_EQ(10, t["first"].asInteger());
+
+    std::cout << static_cast<int>(t["third"].getValue().type()) << std::endl;
+
+    EXPECT_EQ("hello", t["third"].asString());
+    EXPECT_FLOAT_EQ(23.5f, t["second"].asFloat());
+}
+
+TEST_F(TestTree, tryToEraseFieldFromValueTreeThrowsErrorWithHelpfulMessage)
+{
+    auto t = Json::Tree(std::string("some_value"));
+    ASSERT_TRUE(t.isValue());
+
+    EXPECT_THROW({
+        try
+        {
+            t.erase("some_field");
+        }
+        catch(std::exception & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("document"));
+            EXPECT_THAT(err_msg, HasSubstr("erase(std::string)"));
+            EXPECT_THAT(err_msg, HasSubstr("value"));
+            throw;
+        }
+    }, Json::Tree::IncorrectCallForType);
+}
+
+TEST_F(TestTree, tryToEraseFieldFromArrayTreeThrowsErrorWithHelpfulMessage)
+{
+    auto t = Json::Tree();
+    t.pushBack(1);
+    ASSERT_TRUE(t.isArray());
+
+    EXPECT_THROW({
+        try
+        {
+            t.erase("some_field");
+        }
+        catch(std::exception & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("document"));
+            EXPECT_THAT(err_msg, HasSubstr("erase(std::string)"));
+            EXPECT_THAT(err_msg, HasSubstr("array"));
+            throw;
+        }
+    }, Json::Tree::IncorrectCallForType);
 }

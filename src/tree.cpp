@@ -1,5 +1,7 @@
 #include <json/tree.hpp>
 
+#include <algorithm>
+
 namespace CodedProject
 {
 namespace Json
@@ -24,32 +26,37 @@ bool Tree::isValue() const
 
 Tree::iterator Tree::begin()
 {
-    return std::begin(document_values_);
+    return std::begin(values_);
 }
 
 Tree::const_iterator Tree::begin() const
 {
-    return std::begin(document_values_);
+    return std::begin(values_);
 }
 
 Tree::const_iterator Tree::cbegin() const noexcept
 {
-    return std::cbegin(document_values_);
+    return std::cbegin(values_);
 }
 
 Tree::iterator Tree::end()
 {
-    return std::end(document_values_);
+    return std::end(values_);
 }
 
 Tree::const_iterator Tree::end() const
 {
-    return std::end(document_values_);
+    return std::end(values_);
 }
 
 Tree::const_iterator Tree::cend() const noexcept
 {
-    return std::cend(document_values_);
+    return std::cend(values_);
+}
+
+size_t Tree::size() const
+{
+    return values_.size();
 }
 
 Tree & Tree::operator[] (size_t index)
@@ -61,46 +68,58 @@ Tree & Tree::operator[] (size_t index)
             typeAsString());
     }
 
-    return array_values_[index];
+    return values_[index].second;
 }
 
 void Tree::pushBack(Tree subtree)
 {
     is_array_ = true;
-    array_values_.push_back(subtree);
-}
-
-size_t Tree::size() const
-{
-    if(isArray())
-        return array_values_.size();
-    else
-        return document_values_.size();
+    values_.push_back({"",subtree});
 }
 
 Tree & Tree::operator[] (std::string const& field)
 {
-    if(isNotDocument())
-    {
-        throw IncorrectCallForType(
-            "document function `operator[] (std::string)`",
-            typeAsString());
-    }
+    throwIncorrectCallIfNotDocument("operator[] (std::string)");
 
     is_document_ = true;
-    return document_values_[field];
+    if(!count(field))
+    {
+        field_indexes_[field] = values_.size();
+        values_.push_back({field, {}});
+    }
+    auto field_index = field_indexes_[field];
+    return values_[field_index].second;
 }
 
 int Tree::count(std::string const& field_name) const
 {
-    if(isNotDocument())
+    throwIncorrectCallIfNotDocument("count()");
+    return field_indexes_.count(field_name);
+}
+
+Tree::size_type Tree::erase(std::string const& field_name)
+{
+    throwIncorrectCallIfNotDocument("erase(std::string)");
+
+    if(!count(field_name))
+        return 0;
+
+    auto index_to_remove = field_indexes_[field_name];
+
+    auto element_to_erase = std::begin(values_);
+    std::advance(element_to_erase, index_to_remove);
+
+    values_.erase(element_to_erase);
+
+    for(auto & kv : field_indexes_)
     {
-        throw IncorrectCallForType(
-            "document function `count()`",
-            typeAsString());
+        if(kv.second>index_to_remove)
+            --kv.second;
     }
 
-    return document_values_.count(field_name);
+    field_indexes_.erase(field_name);
+
+    return 1;
 }
 
 Value const& Tree::getValue() const
@@ -134,13 +153,25 @@ std::string Tree::typeAsString() const
         return "array";
     else if(isDocument())
         return "document";
-    else
+    else if(isValue())
         return "value";
+    else
+        return "uninitalised Tree";
 }
 
 bool Tree::isNotDocument() const
 {
     return isValue() || isArray();
+}
+
+void Tree::throwIncorrectCallIfNotDocument(std::string function_signature) const
+{
+    if(isNotDocument())
+    {
+        throw IncorrectCallForType(
+            "document function `" + function_signature + "`",
+            typeAsString());
+    }
 }
 
 }

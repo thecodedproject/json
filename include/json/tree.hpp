@@ -22,13 +22,14 @@ public:
             std::string const& tree_type)
         : std::runtime_error(
             "Trying to call " + function_description +
-            " on tree of type " + tree_type + ".")
+            " on Json::Tree of type " + tree_type + ".")
         {
         }
     };
 
-    typedef std::map<std::string, Tree>::iterator iterator;
-    typedef std::map<std::string, Tree>::const_iterator const_iterator;
+    typedef std::vector<std::pair<std::string, Tree>>::iterator iterator;
+    typedef std::vector<std::pair<std::string, Tree>>::const_iterator const_iterator;
+    typedef std::vector<std::pair<std::string, Tree>>::size_type size_type;
 
     Tree();
 
@@ -46,12 +47,12 @@ public:
     const_iterator end() const;
     const_iterator cend() const noexcept;
 
+    size_t size() const;
+
     // ----- Array functions -------
     Tree & operator[] (size_t index);
 
     void pushBack(Tree subtree);
-
-    size_t size() const;
 
     // ----- Document functions -------
 
@@ -64,6 +65,8 @@ public:
     //Value const& operator[] (std::string const& field) const;
 
     int count(std::string const& field_name) const;
+
+    size_type erase(std::string const& field);
 
     // ----- Value functions -------
     Value const& getValue() const;
@@ -78,12 +81,14 @@ private:
 
     bool isNotDocument() const;
 
+    void throwIncorrectCallIfNotDocument(std::string function_signature) const;
+
     bool is_array_ = false;
     bool is_document_ = false;
     bool is_value_ = false;
 
-    std::vector<Tree> array_values_ = {};
-    std::map<std::string, Tree> document_values_ = {};
+    std::vector<std::pair<std::string, Tree>> values_ = {};
+    std::map<std::string, size_t> field_indexes_ = {};
     Value value_ = {};
 };
 
