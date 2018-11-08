@@ -37,14 +37,14 @@ TEST_F(TestValue, constructFromStringAndGetValueAsString)
 {
     auto value = std::string("some_value");
     auto v = Json::Value(value);
-    EXPECT_EQ(value, v.asString());
+    EXPECT_EQ(value, v.get<std::string>());
 }
 
 TEST_F(TestValue, constructFromCharArrayAndGetValueAsString)
 {
     auto value = "some_value_2";
     auto v = Json::Value(value);
-    EXPECT_EQ(value, v.asString());
+    EXPECT_EQ(value, v.get<std::string>());
 }
 
 TEST_F(TestValue, constructFromIntAndGetValueAsStringThrowsWithHelpfulMessage)
@@ -53,14 +53,14 @@ TEST_F(TestValue, constructFromIntAndGetValueAsStringThrowsWithHelpfulMessage)
     EXPECT_THROW({
         try
         {
-            v.asString();
+            v.get<std::string>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("10"));
             EXPECT_THAT(err_msg, HasSubstr("Integer"));
-            EXPECT_THAT(err_msg, HasSubstr("asString"));
+            EXPECT_THAT(err_msg, HasSubstr("std::string"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -72,14 +72,14 @@ TEST_F(TestValue, constructFromTrueBoolAndGetValueAsStringThrowsWithHelpfulMessa
     EXPECT_THROW({
         try
         {
-            v.asString();
+            v.get<std::string>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("true"));
             EXPECT_THAT(err_msg, HasSubstr("Bool"));
-            EXPECT_THAT(err_msg, HasSubstr("asString"));
+            EXPECT_THAT(err_msg, HasSubstr("std::string"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -91,14 +91,14 @@ TEST_F(TestValue, constructFromFalseBoolAndGetValueAsStringThrowsWithHelpfulMess
     EXPECT_THROW({
         try
         {
-            v.asString();
+            v.get<std::string>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("false"));
             EXPECT_THAT(err_msg, HasSubstr("Bool"));
-            EXPECT_THAT(err_msg, HasSubstr("asString"));
+            EXPECT_THAT(err_msg, HasSubstr("std::string"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -110,14 +110,14 @@ TEST_F(TestValue, constructFromFloatAndGetValueAsStringThrowsWithHelpfulMessage)
     EXPECT_THROW({
         try
         {
-            v.asString();
+            v.get<std::string>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("2.50"));
             EXPECT_THAT(err_msg, HasSubstr("Float"));
-            EXPECT_THAT(err_msg, HasSubstr("asString"));
+            EXPECT_THAT(err_msg, HasSubstr("std::string"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -127,7 +127,7 @@ TEST_F(TestValue, constructFromIntAndGetValueAsInteger)
 {
     auto value = 23;
     auto v = Json::Value(value);
-    EXPECT_EQ(value, v.asInteger());
+    EXPECT_EQ(value, v.get<int>());
 }
 
 TEST_F(TestValue, constructFromStringAndGetValueAsIntegerThrowsWithHelpfulMessage)
@@ -136,14 +136,14 @@ TEST_F(TestValue, constructFromStringAndGetValueAsIntegerThrowsWithHelpfulMessag
     EXPECT_THROW({
         try
         {
-            v.asInteger();
+            v.get<int>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("hello"));
             EXPECT_THAT(err_msg, HasSubstr("String"));
-            EXPECT_THAT(err_msg, HasSubstr("asInteger"));
+            EXPECT_THAT(err_msg, HasSubstr("int"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -155,14 +155,14 @@ TEST_F(TestValue, constructFromFloatAndGetValueAsIntegerThrowsWithHelpfulMessage
     EXPECT_THROW({
         try
         {
-            v.asInteger();
+            v.get<int>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("4.50"));
             EXPECT_THAT(err_msg, HasSubstr("Float"));
-            EXPECT_THAT(err_msg, HasSubstr("asInteger"));
+            EXPECT_THAT(err_msg, HasSubstr("int"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -174,14 +174,14 @@ TEST_F(TestValue, constructFromBoolAndGetValueAsIntegerThrowsWithHelpfulMessage)
     EXPECT_THROW({
         try
         {
-            v.asInteger();
+            v.get<int>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("true"));
             EXPECT_THAT(err_msg, HasSubstr("Bool"));
-            EXPECT_THAT(err_msg, HasSubstr("asInteger"));
+            EXPECT_THAT(err_msg, HasSubstr("int"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -191,7 +191,7 @@ TEST_F(TestValue, constructFromFloatAndGetValueAsFloat)
 {
     auto value = 23.5f;
     auto v = Json::Value(value);
-    EXPECT_EQ(value, v.asFloat());
+    EXPECT_EQ(value, v.get<float>());
 }
 
 TEST_F(TestValue, constructFromStringAndGetValueAsFloatThrowsWithHelpfulMessage)
@@ -200,14 +200,14 @@ TEST_F(TestValue, constructFromStringAndGetValueAsFloatThrowsWithHelpfulMessage)
     EXPECT_THROW({
         try
         {
-            v.asFloat();
+            v.get<float>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("eggs"));
             EXPECT_THAT(err_msg, HasSubstr("String"));
-            EXPECT_THAT(err_msg, HasSubstr("asFloat"));
+            EXPECT_THAT(err_msg, HasSubstr("float"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -219,14 +219,14 @@ TEST_F(TestValue, constructFromIntAndGetValueAsFloatThrowsWithHelpfulMessage)
     EXPECT_THROW({
         try
         {
-            v.asFloat();
+            v.get<float>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("13"));
             EXPECT_THAT(err_msg, HasSubstr("Integer"));
-            EXPECT_THAT(err_msg, HasSubstr("asFloat"));
+            EXPECT_THAT(err_msg, HasSubstr("float"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -238,14 +238,14 @@ TEST_F(TestValue, constructFromBoolAndGetValueAsFloatThrowsWithHelpfulMessage)
     EXPECT_THROW({
         try
         {
-            v.asFloat();
+            v.get<float>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("false"));
             EXPECT_THAT(err_msg, HasSubstr("Bool"));
-            EXPECT_THAT(err_msg, HasSubstr("asFloat"));
+            EXPECT_THAT(err_msg, HasSubstr("float"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -255,7 +255,7 @@ TEST_F(TestValue, constructFromBoolAndGetValueAsBool)
 {
     auto value = true;
     auto v = Json::Value(value);
-    EXPECT_EQ(value, v.asBool());
+    EXPECT_EQ(value, v.get<bool>());
 }
 
 TEST_F(TestValue, constructFromStringAndGetValueAsBoolThrowsWithHelpfulMessage)
@@ -264,14 +264,14 @@ TEST_F(TestValue, constructFromStringAndGetValueAsBoolThrowsWithHelpfulMessage)
     EXPECT_THROW({
         try
         {
-            v.asBool();
+            v.get<bool>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("coke"));
             EXPECT_THAT(err_msg, HasSubstr("String"));
-            EXPECT_THAT(err_msg, HasSubstr("asBool"));
+            EXPECT_THAT(err_msg, HasSubstr("bool"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -283,14 +283,14 @@ TEST_F(TestValue, constructFromFloatAndGetValueAsBoolThrowsWithHelpfulMessage)
     EXPECT_THROW({
         try
         {
-            v.asBool();
+            v.get<bool>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("34.50"));
             EXPECT_THAT(err_msg, HasSubstr("Float"));
-            EXPECT_THAT(err_msg, HasSubstr("asBool"));
+            EXPECT_THAT(err_msg, HasSubstr("bool"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -302,14 +302,14 @@ TEST_F(TestValue, constructFromIntAndGetValueAsBoolThrowsWithHelpfulMessage)
     EXPECT_THROW({
         try
         {
-            v.asBool();
+            v.get<bool>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("32"));
             EXPECT_THAT(err_msg, HasSubstr("Integer"));
-            EXPECT_THAT(err_msg, HasSubstr("asBool"));
+            EXPECT_THAT(err_msg, HasSubstr("bool"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);

@@ -49,6 +49,8 @@ public:
 
     size_t size() const;
 
+    void erase(iterator position);
+
     // ----- Array functions -------
     Tree & operator[] (size_t index);
 
@@ -70,10 +72,9 @@ public:
 
     // ----- Value functions -------
     Value const& getValue() const;
-    std::string asString() const;
-    int asInteger() const;
-    float asFloat() const;
-    bool asBool() const;
+
+    template <typename T>
+    T get() const;
 
 private:
 
@@ -99,6 +100,11 @@ Tree::Tree(T const& value)
 {
 }
 
+template <typename T>
+T Tree::get() const
+{
+    return value_.get<T>();
+}
 
 }
 }

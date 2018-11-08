@@ -22,9 +22,9 @@ public:
     class IncorrectTypeConversion : public std::runtime_error
     {
     public:
-        IncorrectTypeConversion(Value const& v, std::string const& function)
+        IncorrectTypeConversion(Value const& v, std::string const& type_string)
         : std::runtime_error(
-            "Trying to get" + v.objectAsPrintableString() + " " + function)
+            "Trying to get " + v.objectAsPrintableString() + " as " + type_string)
         {
         }
     };
@@ -39,10 +39,7 @@ public:
 
     Type type() const;
 
-    std::string asString() const;
-    int asInteger() const;
-    float asFloat() const;
-    bool asBool() const;
+    template <typename T> T get() const;
 
 private:
 

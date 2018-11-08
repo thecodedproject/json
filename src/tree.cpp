@@ -59,6 +59,11 @@ size_t Tree::size() const
     return values_.size();
 }
 
+void Tree::erase(iterator position)
+{
+    values_.erase(position);
+}
+
 Tree & Tree::operator[] (size_t index)
 {
     if(!isArray())
@@ -125,26 +130,6 @@ Tree::size_type Tree::erase(std::string const& field_name)
 Value const& Tree::getValue() const
 {
     return value_;
-}
-
-std::string Tree::asString() const
-{
-    return value_.asString();
-}
-
-int Tree::asInteger() const
-{
-    return value_.asInteger();
-}
-
-float Tree::asFloat() const
-{
-    return value_.asFloat();
-}
-
-bool Tree::asBool() const
-{
-    return value_.asBool();
 }
 
 std::string Tree::typeAsString() const

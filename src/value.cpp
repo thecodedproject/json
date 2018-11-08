@@ -60,7 +60,8 @@ Value::Type Value::type() const
     return type_;
 }
 
-std::string Value::asString() const
+template <>
+std::string Value::get() const
 {
     if(type_ == Type::String)
     {
@@ -68,11 +69,12 @@ std::string Value::asString() const
     }
     else
     {
-        throw IncorrectTypeConversion(*this, "asString");
+        throw IncorrectTypeConversion(*this, "std::string");
     }
 }
 
-int Value::asInteger() const
+template <>
+int Value::get() const
 {
     if(type_ == Type::Integer)
     {
@@ -80,11 +82,12 @@ int Value::asInteger() const
     }
     else
     {
-        throw IncorrectTypeConversion(*this, "asInteger");
+        throw IncorrectTypeConversion(*this, "int");
     }
 }
 
-float Value::asFloat() const
+template <>
+float Value::get() const
 {
     if(type_ == Type::Float)
     {
@@ -92,11 +95,12 @@ float Value::asFloat() const
     }
     else
     {
-        throw IncorrectTypeConversion(*this, "asFloat");
+        throw IncorrectTypeConversion(*this, "float");
     }
 }
 
-bool Value::asBool() const
+template <>
+bool Value::get() const
 {
     if(type_ == Type::Bool)
     {
@@ -104,7 +108,7 @@ bool Value::asBool() const
     }
     else
     {
-        throw IncorrectTypeConversion(*this, "asBool");
+        throw IncorrectTypeConversion(*this, "bool");
     }
 }
 
