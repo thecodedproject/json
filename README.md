@@ -62,6 +62,9 @@ Builder?
 
 ### Idea for templated Value:
 
+**Note** that this wont work because it will mean that the type contained within the Value would need to be named within any containers which hold multiple values, i.e. within the contianer inside the Tree class.
+This goes against the purpose of the value type which is abstract away the actual underlying type at compile time, having it only visible at runtime.
+
 ```
 template <typename T>
 class Value
@@ -120,7 +123,42 @@ Value::Type Value<T>::type() const
 
 ```
 
+The ValueTypeTraits could contain a return type for each, such that specialisations of different similar types could return the same things, e.g. flaot and double always returning double maybe??
 
+```
+template <>
+struct TypeTrait<float>
+{
+    static Value::Type type = Value::Type::Double;
+    typedef double return_type;
+};
+
+template <>
+struct TypeTrait<double>
+{
+    static Value::Type type = Value::Type::Double;
+    typedef double return_type;
+};
+
+```
+
+or std;:string and char * always returning std::string:
+
+```
+template <>
+struct TypeTrait<std::string>
+{
+    static Value::Type type = Value::Type::String;
+    typedef std::string return_type;
+};
+
+template <>
+struct TypeTrait<char*>
+{
+    static Value::Type type = Value::Type::String;
+    typedef std::string return_type;
+};
+```
 
 
 
