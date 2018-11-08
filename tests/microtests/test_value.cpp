@@ -40,9 +40,7 @@ TEST_F(TestValue, constructFromStringAndGetValueAsString)
     EXPECT_EQ(value, v.asString());
 }
 
-// Not quite sure how to make this pass right now so
-// ignoring it - JDC 20181103
-TEST_F(TestValue, DISABLED_constructFromCharArrayAndGetValueAsString)
+TEST_F(TestValue, constructFromCharArrayAndGetValueAsString)
 {
     auto value = "some_value_2";
     auto v = Json::Value(value);

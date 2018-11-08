@@ -7,30 +7,35 @@ namespace Json
 
 Value::Value() = default;
 
-Value::Value(std::string const& s)
+template <>
+Value::Value(std::string s)
 : type_(Type::String),
   string_value_(s)
 {
 }
 
-Value::Value(char * s)
+template <>
+Value::Value(char const * s)
 : type_(Type::String),
   string_value_(s)
 {
 }
 
+template <>
 Value::Value(int i)
 : type_(Type::Integer),
   integer_value_(i)
 {
 }
 
+template <>
 Value::Value(float f)
 : type_(Type::Float),
   float_value_(f)
 {
 }
 
+template <>
 Value::Value(bool b)
 : type_(Type::Bool),
   bool_value_(b)

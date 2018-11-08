@@ -31,14 +31,8 @@ public:
 
     Value();
 
-    // These would be better servered by a template constructor
-    // which used enable_if and type traits to turn on certain
-    // constructors based upon the type being passed in JDC 20181105
-    Value(std::string const& s);
-    Value(char * s);
-    Value(int i);
-    Value(float f);
-    Value(bool b);
+    template <typename T>
+    Value(T value);
 
     bool operator== (Value const& rhs) const;
     bool operator!= (Value const& rhs) const;
