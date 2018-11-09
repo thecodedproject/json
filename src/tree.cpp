@@ -61,7 +61,8 @@ size_t Tree::size() const
 
 void Tree::erase(iterator position)
 {
-    values_.erase(position);
+    auto field_to_remove = position->first;
+    erase(field_to_remove);
 }
 
 Tree & Tree::operator[] (size_t index)
