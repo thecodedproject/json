@@ -2,12 +2,29 @@
 
 #include <algorithm>
 
+#include <iostream>
+
 namespace CodedProject
 {
 namespace Json
 {
 
 Tree::Tree() = default;
+
+bool Tree::operator== (Tree const& rhs) const
+{
+    if(isDocument() || isArray())
+    {
+        return values_ == rhs.values_;
+    }
+
+    return value_ == rhs.value_;
+}
+
+bool Tree::operator!= (Tree const& rhs) const
+{
+    return !operator==(rhs);
+}
 
 bool Tree::isArray() const
 {

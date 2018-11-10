@@ -2,6 +2,7 @@
 set(target_SRC
     test_builder.cpp
     test_tree_array_usage.cpp
+    test_tree_comparison.cpp
     test_tree_construction.cpp
     test_tree_document_usage.cpp
     test_tree_erase.cpp

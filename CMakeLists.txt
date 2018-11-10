@@ -11,7 +11,7 @@ include(make_check_macros)
 
 setup_make_check()
 
-add_definitions(-std=c++1y)
+add_definitions(-std=c++1z)
 
 add_subdirectory(src)
 

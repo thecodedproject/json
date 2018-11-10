@@ -36,6 +36,9 @@ public:
     template <typename T>
     Tree(T const& value);
 
+    bool operator== (Tree const& rhs) const;
+    bool operator!= (Tree const& rhs) const;
+
     bool isArray() const;
     bool isDocument() const;
     bool isValue() const;
