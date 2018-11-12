@@ -59,6 +59,48 @@ Builder?
 
 * Does not allow duplicate fields to be inserted into a document (although I think that this may be valid JSON)
 
+### Idea for Basic Build structure (to remove duplicate code)
+
+```
+class BasicBuilderBase
+{
+ ... commong stuffs ...
+};
+
+class Document : BasicBuilderBase {...};
+
+class Array : BasicBuilderBase {...};
+```
+
+### Idea for inheritance hirearchy
+
+I don' really like this design as TreeBase will still need to have all of the methods for accessing either a document, array or value so that when iterating over a Tree you can access the contents regarless of underlying type - to me this represents just writing extra code for the sake of a small sytactic improvment.
+```
+class TreeBase
+{
+    ... all public methods from Tree ...
+protected:
+    (all private functions from current Tree class as protected members)
+};
+
+class Document : public TreeBase
+{
+public:
+    ... all document functions from Tree ...
+};
+
+class Array : public TreeBase
+{
+public:
+    ... all array functions from Tree ...
+};
+
+class Value : puble TreeBase
+{
+    ... all value functions from tree ...
+};
+```
+
 
 ### Idea for templated Value:
 
