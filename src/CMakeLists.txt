@@ -1,6 +1,4 @@
 set(target_SRC
-    builder/basic/array.cpp
-    builder/basic/document.cpp
     builder.cpp
     tree.cpp
     value.cpp
