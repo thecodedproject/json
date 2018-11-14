@@ -166,7 +166,7 @@ TEST_F(TestBuilder, appendMutipleFieldsOfDifferentTypesGivesExpectedDocument)
     EXPECT_EQ(expected, t);
 }
 
-TEST_F(TestBuilder, pushBackMultipleValuesOfDifferentTypesGiveExpectedArray)
+TEST_F(TestBuilder, pushBackMultipleValuesOfDifferentTypesGivesExpectedArray)
 {
     auto expected = Json::Tree();
     expected.pushBack(true);
@@ -182,7 +182,7 @@ TEST_F(TestBuilder, pushBackMultipleValuesOfDifferentTypesGiveExpectedArray)
     EXPECT_EQ(expected, t);
 }
 
-TEST_F(TestBuilder, openSubArrayAndAddMultipleFieldsGiveExpectedArray)
+TEST_F(TestBuilder, openSubtreeInArrayAndPushBackMultipleFieldsGivesExpectedArrayInArray)
 {
     auto subarray = Json::Tree();
     subarray.pushBack(true);
@@ -191,16 +191,77 @@ TEST_F(TestBuilder, openSubArrayAndAddMultipleFieldsGiveExpectedArray)
     auto expected = Json::Tree();
     expected.pushBack(subarray);
     auto t = Builder()
-        .openArray()
+        .openSubtree()
             .pushBack(true)
             .pushBack(123)
             .pushBack(std::string("hello"))
-        .closeArray()
+        .closeSubtree()
         .getTree();
     EXPECT_EQ(expected, t);
 }
 
-TEST_F(TestBuilder, openSubdocumentForFieldAndAddSomeElementsGivesExpectedDocument)
+TEST_F(TestBuilder, openSubtreeInArrayAndAppendMultipleFieldsGivesExpectedDocumentInArray)
+{
+    auto subdoc = Json::Tree();
+    subdoc["a"] = true;
+    subdoc["b"] = 123;
+    subdoc["c"] = std::string("hello");
+    auto expected = Json::Tree();
+    expected.pushBack(subdoc);
+    auto t = Builder()
+        .openSubtree()
+            .append("a", true)
+            .append("b", 123)
+            .append("c", std::string("hello"))
+        .closeSubtree()
+        .getTree();
+    EXPECT_EQ(expected, t);
+}
+
+TEST_F(TestBuilder, openMultipleSubTreesAndPushBackMultipleFieldsGivesExpectedArray)
+{
+    auto subarray1 = Json::Tree();
+    subarray1.pushBack(true);
+    subarray1.pushBack(123);
+    subarray1.pushBack(std::string("hello"));
+
+    auto subarray2 = Json::Tree();
+    subarray2.pushBack(subarray1);
+    subarray2.pushBack(2);
+
+    auto subarray3 = Json::Tree();
+    subarray3.pushBack(true);
+    subarray3.pushBack(subarray2);
+
+    auto subarray4 = Json::Tree();
+    subarray4.pushBack(std::string("four"));
+    subarray4.pushBack(subarray3);
+
+    auto expected = Json::Tree();
+    expected.pushBack(subarray4);
+    expected.pushBack(std::string("top"));
+    auto t = Builder()
+        .openSubtree()
+            .pushBack(std::string("four"))
+            .openSubtree()
+                .pushBack(true)
+                .openSubtree()
+                    .openSubtree()
+                        .pushBack(true)
+                        .pushBack(123)
+                        .pushBack(std::string("hello"))
+                    .closeSubtree()
+                    .pushBack(2)
+                .closeSubtree()
+            .closeSubtree()
+        .closeSubtree()
+        .pushBack(std::string("top"))
+        .getTree();
+    EXPECT_EQ(expected, t);
+}
+
+TEST_F(TestBuilder,
+    openSubtreeForFieldAndPushBackSomeElementsGivesExpectedSubDocumentInDocument)
 {
     auto subtree = Json::Tree();
     subtree["a"] = std::string("some");
@@ -208,10 +269,10 @@ TEST_F(TestBuilder, openSubdocumentForFieldAndAddSomeElementsGivesExpectedDocume
     auto expected = Json::Tree();
     expected["subtree"] = subtree;
     auto t = Builder()
-        .openDocument("subtree")
+        .openSubtree("subtree")
             .append("a", std::string("some"))
             .append("b", 12.3f)
-        .closeDocument()
+        .closeSubtree()
         .getTree();
     EXPECT_EQ(expected, t);
 }
@@ -228,15 +289,160 @@ TEST_F(TestBuilder, openMultipleSubdocumentsForFieldAndAddSomeElementsGivesExpec
     auto expected = Json::Tree();
     expected["a_subtree"] = a_subtree;
     auto t = Builder()
-        .openDocument("a_subtree")
-            .openDocument("b_subtree")
-                .openDocument("c_subtree")
+        .openSubtree("a_subtree")
+            .openSubtree("b_subtree")
+                .openSubtree("c_subtree")
                     .append("a", std::string("some"))
                     .append("b", 12.3f)
-                .closeDocument()
-            .closeDocument()
-        .closeDocument()
+                .closeSubtree()
+            .closeSubtree()
+        .closeSubtree()
         .getTree();
     EXPECT_EQ(expected, t);
 }
 
+TEST_F(TestBuilder, addSubarraysToDocumentGivesExpectedDocument)
+{
+    auto a1 = Json::Tree();
+    a1.pushBack(1);
+    a1.pushBack(2);
+
+    auto a2 = Json::Tree();
+    a2.pushBack(3.0f);
+    a2.pushBack(5.0f);
+
+    auto a3 = Json::Tree();
+    a3.pushBack(true);
+    a3.pushBack(false);
+    a3.pushBack(std::string("six"));
+
+    auto a4 = Json::Tree();
+    a4.pushBack(std::string("seven"));
+    a4.pushBack(8);
+
+    auto expected = Json::Tree();
+    expected["a1"] = a1;
+    expected["a2"] = a2;
+    expected["a3"] = a3;
+    expected["a4"] = a4;
+
+    auto t = Builder()
+        .openSubtree("a1")
+            .pushBack(1)
+            .pushBack(2)
+        .closeSubtree()
+        .openSubtree("a2")
+            .pushBack(3.0f)
+            .pushBack(5.0f)
+        .closeSubtree()
+        .openSubtree("a3")
+            .pushBack(true)
+            .pushBack(false)
+            .pushBack(std::string("six"))
+        .closeSubtree()
+        .openSubtree("a4")
+            .pushBack(std::string("seven"))
+            .pushBack(8)
+        .closeSubtree()
+        .getTree();
+    EXPECT_EQ(expected, t);
+}
+
+TEST_F(TestBuilder, addSubdocumentsToArrayGiveExpectedArray)
+{
+    auto d1 = Json::Tree();
+    d1["a"] = 1;
+    d1["b"] = true;
+
+    auto d2 = Json::Tree();
+    d2["a"] = std::string("hello");
+    d2["c"] = 123.5f;
+
+    auto d3 = Json::Tree();
+    d3["d"] = false;
+    d3["e"] = std::string("world");
+
+    auto expected = Json::Tree();
+    expected.pushBack(d1);
+    expected.pushBack(d2);
+    expected.pushBack(d3);
+
+    auto t = Builder()
+        .openSubtree()
+            .append("a", 1)
+            .append("b", true)
+        .closeSubtree()
+        .openSubtree()
+            .append("a", std::string("hello"))
+            .append("c", 123.5f)
+        .closeSubtree()
+        .openSubtree()
+            .append("d", false)
+            .append("e", std::string("world"))
+        .closeSubtree()
+        .getTree();
+    EXPECT_EQ(expected, t);
+}
+
+TEST_F(TestBuilder, addNestedSubArraysAndSubDocumentsToDocumentGivesExpectedDocument)
+{
+    auto a1 = Json::Tree();
+    a1.pushBack(1);
+    a1.pushBack(2);
+
+    auto d1 = Json::Tree();
+    d1["a"] = 1;
+    d1["b"] = a1;
+
+    auto d2 = Json::Tree();
+    d2["a"] = std::string("hello");
+    d2["c"] = 123.5f;
+
+    auto a2 = Json::Tree();
+    a2.pushBack(3.0f);
+    a2.pushBack(5.0f);
+    a2.pushBack(d2);
+
+    auto d3 = Json::Tree();
+    d3["d"] = a2;
+    d3["e"] = std::string("world");
+
+    auto a3 = Json::Tree();
+    a3.pushBack(true);
+    a3.pushBack(false);
+    a3.pushBack(std::string("six"));
+
+    auto expected = Json::Tree();
+    expected["val"] = 123;
+    expected["d1"] = d1;
+    expected["d3"] = d3;
+    expected["a3"] = a3;
+
+    auto t = Builder()
+        .append("val", 123)
+        .openSubtree("d1")
+            .append("a", 1)
+            .openSubtree("b")
+                .pushBack(1)
+                .pushBack(2)
+            .closeSubtree()
+        .closeSubtree()
+        .openSubtree("d3")
+            .openSubtree("d")
+                .pushBack(3.0f)
+                .pushBack(5.0f)
+                .openSubtree()
+                    .append("a", std::string("hello"))
+                    .append("c", 123.5f)
+                .closeSubtree()
+            .closeSubtree()
+            .append("e", std::string("world"))
+        .closeSubtree()
+        .openSubtree("a3")
+            .pushBack(true)
+            .pushBack(false)
+            .pushBack(std::string("six"))
+        .closeSubtree()
+        .getTree();
+    EXPECT_EQ(expected, t);
+}

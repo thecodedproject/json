@@ -59,7 +59,52 @@ Builder?
 
 * Does not allow duplicate fields to be inserted into a document (although I think that this may be valid JSON)
 
+
+
+## Future improvements
+
+### Extra helper methods on Builder
+
+```
+Builder.append({"a", 1}, {"b", 2}, ...)
+
+Builder.pushBack(1, 2, ...)
+
+
+Builder.append("a", Container<T>)
+```
+
+
+### Builder interface
+
+Not sure of the interface for openeing/closing subtrees in the builder.
+Currently use the methods openSubtree and closeSubtree; however these don't make explicitly clear what you are adding to... Not sure if that is a problem?
+
+### Possible issue
+
+Does
+
+```
+template <typename T>
+Tree(T const& value);
+```
+define the copy constructor for Tree??
+
+### Issue with const-ness of field values in tree
+
+Currently field values in a tree and not const; therefore when iterating over a tree they could be changed. I'm not sure if this is desired behvaiour?
+
+If it is, it defaintely won't work properly - the field values may be changed, but the indexs which they associate to will not be updated so future field-name look up with fail for the new values (and be incorrect for the old values).
+
+If it not, then the field values need to be made const - however this is slightly complicated as `std::pair<std::string const, Tree>` has an implicitly deleted copy constructor, and the copy constructor is needed by some methods on `std;:vector`.
+I see two options here; either
+
+* make a new key-value-pair type where the key value is always const but is also copyable (will probably require some nasty `const_cast`, and update `Tree::values_` to use that new type instead of `std::pair`
+* _Or_ make a custom iterator for tree which always returns a const reference to the field.
+
 ### Idea for Basic Build structure (to remove duplicate code)
+
+**Note** Does not work as the `closeDocument` and `closeArray` functions on a builder need to return the same type, and if there are different builder types for document and arrays the close methods have no knowledge of what type they should be returning.
 
 ```
 class BasicBuilderBase

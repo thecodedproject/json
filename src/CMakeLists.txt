@@ -1,5 +1,6 @@
 set(target_SRC
     builder.cpp
+    conversion.cpp
     tree.cpp
     value.cpp
 )

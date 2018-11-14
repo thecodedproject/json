@@ -23,11 +23,21 @@ public:
     Builder& pushBack(
         T const& value);
 
+    Builder& openSubtree();
+    Builder& openSubtree(std::string const& field);
+    Builder& closeSubtree();
+
+/*  I dont think it makes sense to present this interface
+    as well as the openSubtree/closeSubtree JDC 20181113
+
     Builder& openArray();
+    Builder& openArray(std::string const& field);
     Builder& closeArray();
 
+    Builder& openDocument();
     Builder& openDocument(std::string const& field);
     Builder& closeDocument();
+*/
 
     Tree getTree();
 

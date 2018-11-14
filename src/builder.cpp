@@ -15,28 +15,27 @@ Builder::Builder(
 {
 }
 
-Builder& Builder::openArray()
+Builder& Builder::openSubtree()
 {
     return setupChildBuilder();
 }
 
-Builder& Builder::closeArray()
-{
-    parent_builder_->pushBack(
-        getTree());
-    return *parent_builder_;
-}
-
-Builder& Builder::openDocument(std::string const& field)
+Builder& Builder::openSubtree(std::string const& field)
 {
     return setupChildBuilder(field);
 }
 
-Builder& Builder::closeDocument()
+Builder& Builder::closeSubtree()
 {
-    parent_builder_->append(
-        parent_field_name_,
-        getTree());
+    if(parent_field_name_.empty())
+    {
+        parent_builder_->pushBack(
+            getTree());
+    }
+    else
+    {
+        parent_builder_->append(parent_field_name_, getTree());
+    }
     return *parent_builder_;
 }
 
