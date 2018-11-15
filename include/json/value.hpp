@@ -8,8 +8,13 @@ namespace CodedProject
 namespace Json
 {
 
+class Value;
+
+std::string toString(Value const& v);
+
 class Value
 {
+friend std::string toString(Value const&);
 public:
     enum class Type
     {

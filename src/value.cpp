@@ -5,6 +5,11 @@ namespace CodedProject
 namespace Json
 {
 
+std::string toString(Value const& v)
+{
+    return v.objectAsPrintableString();
+}
+
 Value::Value() = default;
 
 template <>

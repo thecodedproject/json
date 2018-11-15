@@ -1,6 +1,6 @@
 
 set(target_SRC
-    conversion_helpers/test_tokenize.cpp
+    conversion_helpers/test_lexer.cpp
     test_builder.cpp
     test_conversion_from_json_string.cpp
     test_tree_array_usage.cpp

@@ -1,4 +1,5 @@
 set(target_SRC
+    conversion_helpers/lexer.cpp
     builder.cpp
     conversion.cpp
     tree.cpp
