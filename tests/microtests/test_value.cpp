@@ -154,6 +154,13 @@ TEST_F(TestValue, constructFromIntAndGetValueAsInteger)
     EXPECT_EQ(value, v.get<int>());
 }
 
+TEST_F(TestValue, constructFromNegativeIntAndGetValueAsInteger)
+{
+    auto value = -23;
+    auto v = Json::Value(value);
+    EXPECT_EQ(value, v.get<int>());
+}
+
 TEST_F(TestValue, defaultConstructAndGetValueAsIntThrowsWithHelpfulMessage)
 {
     auto v = Json::Value();

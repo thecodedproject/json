@@ -1,5 +1,8 @@
 #include <json/conversion_helpers/lexer.hpp>
 
+#include <functional>
+#include <map>
+
 #include <iostream>
 
 namespace CodedProject
@@ -17,89 +20,96 @@ Lexer::Lexer(std::string const& json_text)
 
 Token Lexer::next()
 {
+    skipWhitespace();
+    return handleNextToken();
+
+}
+void Lexer::skipWhitespace()
+{
+    while(*current_char_ == ' ' || *current_char_ == '\n')
+    {
+        ++current_char_;
+    }
+}
+
+Token Lexer::handleNextToken()
+{
+    auto a = std::bind(&Lexer::advanceCurrentCharAndReturnToken, this, Token{TokenType::LeftArrayBrace});
+
+    auto char_tokens_and_length = std::map<char,std::pair<Token, size_t>>{
+        {'[', {{TokenType::LeftArrayBrace},1}},
+        {']', {{TokenType::RightArrayBrace},1}},
+        {'{', {{TokenType::LeftDocumentBrace},1}},
+        {'}', {{TokenType::RightDocumentBrace},1}},
+        {':', {{TokenType::Colon},1}},
+        {',', {{TokenType::Comma},1}},
+        {'t', {{TokenType::Value, true},4}},
+        {'f', {{TokenType::Value, false},5}},
+        {'n', {{TokenType::Value, {}},4}}
+    };
+
     if(current_char_ == std::end(json_text_))
     {
         return {TokenType::Eof};
     }
-    if(*current_char_ == '[')
+    else if(char_tokens_and_length.count(*current_char_))
     {
         return advanceCurrentCharAndReturnToken(
-            {TokenType::LeftArrayBrace});
+            char_tokens_and_length[*current_char_]);
     }
-    else if(*current_char_ == ']')
+    else if(*current_char_ == '"')
     {
-        return advanceCurrentCharAndReturnToken(
-            {TokenType::RightArrayBrace});
+        return handleStringValue();
     }
     else
     {
-
-        if(*current_char_ == '"')
-        {
-            ++current_char_;
-
-            auto string_start_char = current_char_;
-
-            while(*current_char_!='"')
-            {
-                ++current_char_;
-            }
-
-            auto value_string = std::string(string_start_char, current_char_);
-
-            return advanceCurrentCharAndReturnToken(
-                {TokenType::Value, value_string});
-        }
-        else if(*current_char_ == 't')
-        {
-            return advanceCurrentCharAndReturnToken(
-                {TokenType::Value, true},
-                4);
-        }
-        else if(*current_char_ == 'f')
-        {
-            return advanceCurrentCharAndReturnToken(
-                {TokenType::Value, false},
-                5);
-        }
-        else if(*current_char_ == 'n')
-        {
-            return advanceCurrentCharAndReturnToken(
-                {TokenType::Value, {}},
-                4);
-        }
-        else
-        {
-
-            auto value_start = current_char_;
-
-            while(std::string("0123456789.").find(*current_char_)!=std::string::npos)
-            {
-                ++current_char_;
-            }
-
-            auto value_string = std::string(value_start, current_char_);
-
-            if(value_string.find(".") == std::string::npos)
-            {
-                return {TokenType::Value, std::stoi(value_string)};
-            }
-            else
-            {
-                return {TokenType::Value, std::stof(value_string)};
-            }
-        }
-
+        return handleNumberValue();
     }
-
 }
 
 Token Lexer::advanceCurrentCharAndReturnToken(
-    Token const& token,
-    size_t const amount_to_advance)
+    std::pair<Token, size_t> const& token_and_length)
 {
-    std::advance(current_char_, amount_to_advance);
-    return token;
+    std::advance(current_char_, token_and_length.second);
+    return token_and_length.first;
+}
+
+Token Lexer::handleStringValue()
+{
+    ++current_char_;
+
+    auto string_start_char = current_char_;
+
+    while(*current_char_!='"')
+    {
+        ++current_char_;
+    }
+
+    auto value_string = std::string(string_start_char, current_char_);
+
+    return advanceCurrentCharAndReturnToken(
+        {{TokenType::Value, value_string},1});
+}
+
+Token Lexer::handleNumberValue()
+{
+    auto value_start = current_char_;
+
+    while(std::string("-0123456789.").find(*current_char_)!=std::string::npos)
+    {
+        ++current_char_;
+    }
+
+    auto value_string = std::string(value_start, current_char_);
+
+    if(value_string.find(".") == std::string::npos)
+    {
+        return {TokenType::Value, std::stoi(value_string)};
+    }
+    else
+    {
+        return {TokenType::Value, std::stof(value_string)};
+    }
 }
 
 }

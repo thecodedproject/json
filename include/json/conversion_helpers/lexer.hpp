@@ -93,9 +93,17 @@ public:
 
 private:
 
+    void skipWhitespace();
+
+    Token handleNextToken();
+
     Token advanceCurrentCharAndReturnToken(
-        Token const& token,
-        size_t amount_to_advance = 1);
+        std::pair<Token, size_t> const& token_and_length);
+
+    Token handleStringValue();
+
+    Token handleNumberValue();
+
 
     std::string json_text_ = {};
     std::string::const_iterator current_char_ = {};
