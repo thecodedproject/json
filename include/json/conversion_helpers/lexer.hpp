@@ -104,7 +104,6 @@ private:
 
     Token handleNumberValue();
 
-
     std::string json_text_ = {};
     std::string::const_iterator current_char_ = {};
     bool first_call_ = true;

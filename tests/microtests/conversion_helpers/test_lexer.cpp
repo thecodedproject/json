@@ -282,3 +282,8 @@ TEST_F(TestConversionHelpersLexer,
     expectNextTokenEq({TokenType::RightDocumentBrace}, lexer);
     expectEndOfFile(lexer);
 }
+
+TEST_F(TestConversionHelpersLexer, DISABLED_givesCorrectTokensForJsonWithWindowsLineEndings)
+{
+    // Cant be bothered to implement this right now... JDC 20181116
+}
