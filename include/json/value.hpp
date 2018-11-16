@@ -21,7 +21,8 @@ public:
         String,
         Integer,
         Float,
-        Bool
+        Bool,
+        Null
     };
 
     class IncorrectTypeConversion : public std::runtime_error
@@ -50,7 +51,7 @@ private:
 
     std::string objectAsPrintableString() const;
 
-    Type type_ = {};
+    Type type_ = Type::Null;
     std::string string_value_ = {};
     int integer_value_ = {};
     float float_value_ = {};

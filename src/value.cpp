@@ -132,6 +132,9 @@ std::string Value::objectAsPrintableString() const
             return "Value(" + string_value_ + ", String)";
         case Type::Float:
             return "Value(" + std::to_string(float_value_) + ", Float)";
+        case Type::Null:
+        default:
+            return "Value(Null)";
     }
 }
 
