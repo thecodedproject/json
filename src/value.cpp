@@ -129,7 +129,7 @@ std::string Value::objectAsPrintableString() const
             else
                 return "Value(false, Bool)";
         case Type::String:
-            return "Value(" + string_value_ + ", String)";
+            return "Value(\"" + string_value_ + "\", String)";
         case Type::Float:
             return "Value(" + std::to_string(float_value_) + ", Float)";
         case Type::Null:
