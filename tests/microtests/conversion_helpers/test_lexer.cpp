@@ -8,12 +8,18 @@ using namespace CodedProject::Json::ConversionHelpers;
 class TestConversionHelpersLexer : public ::testing::Test
 {
 protected:
+
+    void expectEq(Token const& expectedToken, Token const& actualToken)
+    {
+        EXPECT_EQ(expectedToken, actualToken) <<
+            "Expected: " << toString(expectedToken) <<
+            "\nActual: " << toString(actualToken);
+    }
+
     void expectNextTokenEq(Token const& expectedToken, Lexer & lexer)
     {
         auto actual = lexer.next();
-        EXPECT_EQ(expectedToken, actual) <<
-            "Expected: " << toString(expectedToken) <<
-            "\nActual: " << toString(actual);
+        expectEq(expectedToken, actual);
     }
 
     void expectEndOfFile(Lexer & lexer)
@@ -286,4 +292,56 @@ TEST_F(TestConversionHelpersLexer,
 TEST_F(TestConversionHelpersLexer, DISABLED_givesCorrectTokensForJsonWithWindowsLineEndings)
 {
     // Cant be bothered to implement this right now... JDC 20181116
+}
+
+TEST_F(TestConversionHelpersLexer, getCurrentTokenBeforeNextHasBeenCalledReturnsStartOfFile)
+{
+    auto json_text = "\"hello\"";
+
+    auto lexer = Lexer(json_text);
+    expectEq({TokenType::StartOfFile}, lexer.currentToken());
+}
+
+TEST_F(TestConversionHelpersLexer, getsCorrectCurrentTokenEachTimeAfterNextIsCalled)
+{
+    auto json_text = "[null,1234,\"hello world\",23.5,true,false,-45,-11.5]";
+
+    auto lexer = Lexer(json_text);
+
+    lexer.next();
+    expectEq({TokenType::LeftArrayBrace}, lexer.currentToken());
+    lexer.next();
+    expectEq({TokenType::Value, {}}, lexer.currentToken());
+    lexer.next();
+    expectEq({TokenType::Comma}, lexer.currentToken());
+    lexer.next();
+    expectEq({TokenType::Value, 1234}, lexer.currentToken());
+    lexer.next();
+    expectEq({TokenType::Comma}, lexer.currentToken());
+    lexer.next();
+    expectEq({TokenType::Value, "hello world"}, lexer.currentToken());
+    lexer.next();
+    expectEq({TokenType::Comma}, lexer.currentToken());
+    lexer.next();
+    expectEq({TokenType::Value, 23.5f}, lexer.currentToken());
+    lexer.next();
+    expectEq({TokenType::Comma}, lexer.currentToken());
+    lexer.next();
+    expectEq({TokenType::Value, true}, lexer.currentToken());
+    lexer.next();
+    expectEq({TokenType::Comma}, lexer.currentToken());
+    lexer.next();
+    expectEq({TokenType::Value, false}, lexer.currentToken());
+    lexer.next();
+    expectEq({TokenType::Comma}, lexer.currentToken());
+    lexer.next();
+    expectEq({TokenType::Value, -45}, lexer.currentToken());
+    lexer.next();
+    expectEq({TokenType::Comma}, lexer.currentToken());
+    lexer.next();
+    expectEq({TokenType::Value, -11.5f}, lexer.currentToken());
+    lexer.next();
+    expectEq({TokenType::RightArrayBrace}, lexer.currentToken());
+    lexer.next();
+    expectEq({TokenType::Eof}, lexer.currentToken());
 }

@@ -21,9 +21,15 @@ Lexer::Lexer(std::string const& json_text)
 Token Lexer::next()
 {
     skipWhitespace();
-    return handleNextToken();
-
+    current_token_ = handleNextToken();
+    return current_token_;
 }
+
+Token Lexer::currentToken()
+{
+    return current_token_;
+}
+
 void Lexer::skipWhitespace()
 {
     while(*current_char_ == ' ' || *current_char_ == '\n')

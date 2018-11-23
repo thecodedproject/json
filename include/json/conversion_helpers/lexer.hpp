@@ -21,7 +21,8 @@ enum class TokenType
     Colon,
     Comma,
     Value,
-    Eof
+    Eof,
+    StartOfFile
 };
 
 namespace {
@@ -45,8 +46,8 @@ std::string toString(TokenType const& type)
             return "TokenType::Value";
         case TokenType::Eof:
             return "TokenType::Eof";
-        default:
-            return "TokenType::Unknown";
+        case TokenType::StartOfFile:
+            return "TokenType::StartOfFile";
     }
 }
 }
@@ -91,6 +92,8 @@ public:
 
     Token next();
 
+    Token currentToken();
+
 private:
 
     void skipWhitespace();
@@ -106,7 +109,7 @@ private:
 
     std::string json_text_ = {};
     std::string::const_iterator current_char_ = {};
-    bool first_call_ = true;
+    Token current_token_ = {TokenType::StartOfFile};
 };
 
 }
