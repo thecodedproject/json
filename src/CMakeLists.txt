@@ -1,5 +1,7 @@
 set(target_SRC
     conversion_helpers/lexer.cpp
+    conversion_helpers/to_json_text.cpp
+    conversion_helpers/token.cpp
     builder.cpp
     conversion.cpp
     tree.cpp

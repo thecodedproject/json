@@ -21,8 +21,42 @@ Lexer::Lexer(std::string const& json_text)
 Token Lexer::next()
 {
     skipWhitespace();
+    last_token_start_char_ = current_char_;
     current_token_ = handleNextToken();
     return current_token_;
+}
+
+Token Lexer::next(TokenType expectedTokenType)
+{
+    auto actual_token = next();
+    if(expectedTokenType != actual_token.type)
+    {
+        auto last_token_start_column = 1;
+        auto last_token_start_line = 1;
+        for(auto it=std::cbegin(json_text_);
+            it!=last_token_start_char_;
+            ++it)
+        {
+            if(*it == '\n')
+            {
+                last_token_start_column = 1;
+                ++last_token_start_line;
+            }
+            else
+            {
+                ++last_token_start_column;
+            }
+
+        }
+
+        throw Json::ParseError(
+            tokenAsJsonText(current_token_),
+            expectedTokenType,
+            last_token_start_line,
+            last_token_start_column);
+    }
+
+    return actual_token;
 }
 
 Token Lexer::currentToken()
@@ -94,7 +128,7 @@ Token Lexer::handleStringValue()
     auto value_string = std::string(string_start_char, current_char_);
 
     return advanceCurrentCharAndReturnToken(
-        {{TokenType::Value, value_string},1});
+        {{TokenType::StringValue, value_string},1});
 }
 
 Token Lexer::handleNumberValue()
@@ -115,6 +149,47 @@ Token Lexer::handleNumberValue()
     else
     {
         return {TokenType::Value, std::stof(value_string)};
+    }
+}
+
+std::string Lexer::tokenAsJsonText(Token const& token) const
+{
+    switch(token.type)
+    {
+        case TokenType::LeftArrayBrace:
+            return "[";
+        case TokenType::RightArrayBrace:
+            return "]";
+        case TokenType::LeftDocumentBrace:
+            return "{";
+        case TokenType::RightDocumentBrace:
+            return "}";
+        case TokenType::Colon:
+            return ":";
+        case TokenType::Comma:
+            return ",";
+        case TokenType::Eof:
+            return "Eof";
+        case TokenType::StartOfFile:
+            return "StartOfFile";
+        case TokenType::StringValue:
+        case TokenType::Value:
+            switch(token.value.type())
+            {
+                case Value::Type::Integer:
+                    return std::to_string(token.value.get<int>());
+                case Value::Type::Bool:
+                    if(token.value.get<bool>())
+                        return "true";
+                    else
+                        return "false";
+                case Value::Type::String:
+                    return "\"" + token.value.get<std::string>() + "\"";
+                case Value::Type::Float:
+                    return std::to_string(token.value.get<float>());
+                case Value::Type::Null:
+                    return "null";
+            }
     }
 }
 

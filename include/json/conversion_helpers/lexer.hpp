@@ -3,87 +3,33 @@
 #include <list>
 #include <string>
 
+#include <json/conversion_helpers/token.hpp>
 #include <json/value.hpp>
 
 namespace CodedProject
 {
 namespace Json
 {
+
+class ParseError : public std::runtime_error
+{
+public:
+    ParseError(
+        std::string const& actual_token_string,
+        ConversionHelpers::TokenType const expected_token_type,
+        int const error_line,
+        int const error_column)
+    : std::runtime_error(
+        "line " + std::to_string(error_line) +
+        ", column " + std::to_string(error_column) +
+        " " + toString(expected_token_type) +
+        " '" + actual_token_string + "'")
+    {
+    }
+};
+
 namespace ConversionHelpers
 {
-
-enum class TokenType
-{
-    LeftArrayBrace,
-    RightArrayBrace,
-    LeftDocumentBrace,
-    RightDocumentBrace,
-    Colon,
-    Comma,
-    Value,
-    Eof,
-    StartOfFile
-};
-
-namespace {
-std::string toString(TokenType const& type)
-{
-    switch(type)
-    {
-        case TokenType::LeftArrayBrace:
-            return "TokenType::LeftArrayBrace";
-        case TokenType::RightArrayBrace:
-            return "TokenType::RightArrayBrace";
-        case TokenType::LeftDocumentBrace:
-            return "TokenType::LeftDocumentBrace";
-        case TokenType::RightDocumentBrace:
-            return "TokenType::RightDocumentBrace";
-        case TokenType::Colon:
-            return "TokenType::Colon";
-        case TokenType::Comma:
-            return "TokenType::Comma";
-        case TokenType::Value:
-            return "TokenType::Value";
-        case TokenType::Eof:
-            return "TokenType::Eof";
-        case TokenType::StartOfFile:
-            return "TokenType::StartOfFile";
-    }
-}
-}
-
-struct Token
-{
-    TokenType type;
-    Value value;
-
-    bool operator==(Token const& rhs) const
-    {
-        return type == rhs.type &&
-            value == rhs.value;
-    }
-};
-
-namespace {
-std::string toString(Token const& token)
-{
-    if(token.type == TokenType::Value)
-    {
-        return "Token("
-            + toString(token.type)
-            + ", "
-            + toString(token.value)
-            + ")";
-    }
-    else
-    {
-        return "Token("
-            + toString(token.type)
-            + ")";
-
-    }
-}
-}
 
 class Lexer
 {
@@ -91,6 +37,8 @@ public:
     Lexer(std::string const& json_text);
 
     Token next();
+
+    Token next(TokenType expectedTokenType);
 
     Token currentToken();
 
@@ -107,8 +55,11 @@ private:
 
     Token handleNumberValue();
 
+    std::string tokenAsJsonText(Token const& token) const;
+
     std::string json_text_ = {};
     std::string::const_iterator current_char_ = {};
+    std::string::const_iterator last_token_start_char_ = {};
     Token current_token_ = {TokenType::StartOfFile};
 };
 

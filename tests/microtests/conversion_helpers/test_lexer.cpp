@@ -4,6 +4,7 @@
 
 using namespace CodedProject;
 using namespace CodedProject::Json::ConversionHelpers;
+using namespace ::testing;
 
 class TestConversionHelpersLexer : public ::testing::Test
 {
@@ -33,7 +34,7 @@ TEST_F(TestConversionHelpersLexer, givesCorrectTokenForStringAndStripsDoubleQuot
     auto json_text = "\"hello\"";
 
     auto lexer = Lexer(json_text);
-    expectNextTokenEq({TokenType::Value, "hello"}, lexer);
+    expectNextTokenEq({TokenType::StringValue, "hello"}, lexer);
     expectEndOfFile(lexer);
 }
 
@@ -42,7 +43,7 @@ TEST_F(TestConversionHelpersLexer, givesCorrectTokenForDiffertStringAndStripsDou
     auto json_text = "\"world\"";
 
     auto lexer = Lexer(json_text);
-    expectNextTokenEq({TokenType::Value, "world"}, lexer);
+    expectNextTokenEq({TokenType::StringValue, "world"}, lexer);
     expectEndOfFile(lexer);
 }
 
@@ -152,7 +153,7 @@ TEST_F(TestConversionHelpersLexer, givesCorrectTokensForArrayWithSingleString)
     auto lexer = Lexer(json_text);
 
     expectNextTokenEq({TokenType::LeftArrayBrace}, lexer);
-    expectNextTokenEq({TokenType::Value, "hello"}, lexer);
+    expectNextTokenEq({TokenType::StringValue, "hello"}, lexer);
     expectNextTokenEq({TokenType::RightArrayBrace}, lexer);
     expectEndOfFile(lexer);
 }
@@ -192,7 +193,7 @@ TEST_F(TestConversionHelpersLexer, givesCorrectTokensForArrayWithMultipleValuesO
     expectNextTokenEq({TokenType::Comma}, lexer);
     expectNextTokenEq({TokenType::Value, 1234}, lexer);
     expectNextTokenEq({TokenType::Comma}, lexer);
-    expectNextTokenEq({TokenType::Value, "hello world"}, lexer);
+    expectNextTokenEq({TokenType::StringValue, "hello world"}, lexer);
     expectNextTokenEq({TokenType::Comma}, lexer);
     expectNextTokenEq({TokenType::Value, 23.5f}, lexer);
     expectNextTokenEq({TokenType::Comma}, lexer);
@@ -219,7 +220,7 @@ TEST_F(TestConversionHelpersLexer,
     expectNextTokenEq({TokenType::Comma}, lexer);
     expectNextTokenEq({TokenType::Value, 1234}, lexer);
     expectNextTokenEq({TokenType::Comma}, lexer);
-    expectNextTokenEq({TokenType::Value, "hello world"}, lexer);
+    expectNextTokenEq({TokenType::StringValue, "hello world"}, lexer);
     expectNextTokenEq({TokenType::Comma}, lexer);
     expectNextTokenEq({TokenType::Value, 23.5f}, lexer);
     expectNextTokenEq({TokenType::Comma}, lexer);
@@ -242,7 +243,7 @@ TEST_F(TestConversionHelpersLexer,
     expectNextTokenEq({TokenType::Comma}, lexer);
     expectNextTokenEq({TokenType::Value, 1234}, lexer);
     expectNextTokenEq({TokenType::Comma}, lexer);
-    expectNextTokenEq({TokenType::Value, "hello world"}, lexer);
+    expectNextTokenEq({TokenType::StringValue, "hello world"}, lexer);
     expectNextTokenEq({TokenType::Comma}, lexer);
     expectNextTokenEq({TokenType::Value, 23.5f}, lexer);
     expectNextTokenEq({TokenType::Comma}, lexer);
@@ -262,27 +263,27 @@ TEST_F(TestConversionHelpersLexer,
     auto lexer = Lexer(json_text);
 
     expectNextTokenEq({TokenType::LeftDocumentBrace}, lexer);
-    expectNextTokenEq({TokenType::Value, "a"}, lexer);
+    expectNextTokenEq({TokenType::StringValue, "a"}, lexer);
     expectNextTokenEq({TokenType::Colon}, lexer);
     expectNextTokenEq({TokenType::Value, {}}, lexer);
     expectNextTokenEq({TokenType::Comma}, lexer);
-    expectNextTokenEq({TokenType::Value, "b"}, lexer);
+    expectNextTokenEq({TokenType::StringValue, "b"}, lexer);
     expectNextTokenEq({TokenType::Colon}, lexer);
     expectNextTokenEq({TokenType::Value, 1234}, lexer);
     expectNextTokenEq({TokenType::Comma}, lexer);
-    expectNextTokenEq({TokenType::Value, "c"}, lexer);
+    expectNextTokenEq({TokenType::StringValue, "c"}, lexer);
     expectNextTokenEq({TokenType::Colon}, lexer);
-    expectNextTokenEq({TokenType::Value, "hello world"}, lexer);
+    expectNextTokenEq({TokenType::StringValue, "hello world"}, lexer);
     expectNextTokenEq({TokenType::Comma}, lexer);
-    expectNextTokenEq({TokenType::Value, "d"}, lexer);
+    expectNextTokenEq({TokenType::StringValue, "d"}, lexer);
     expectNextTokenEq({TokenType::Colon}, lexer);
     expectNextTokenEq({TokenType::Value, 23.5f}, lexer);
     expectNextTokenEq({TokenType::Comma}, lexer);
-    expectNextTokenEq({TokenType::Value, "e"}, lexer);
+    expectNextTokenEq({TokenType::StringValue, "e"}, lexer);
     expectNextTokenEq({TokenType::Colon}, lexer);
     expectNextTokenEq({TokenType::Value, true}, lexer);
     expectNextTokenEq({TokenType::Comma}, lexer);
-    expectNextTokenEq({TokenType::Value, "f"}, lexer);
+    expectNextTokenEq({TokenType::StringValue, "f"}, lexer);
     expectNextTokenEq({TokenType::Colon}, lexer);
     expectNextTokenEq({TokenType::Value, false}, lexer);
     expectNextTokenEq({TokenType::RightDocumentBrace}, lexer);
@@ -319,7 +320,7 @@ TEST_F(TestConversionHelpersLexer, getsCorrectCurrentTokenEachTimeAfterNextIsCal
     lexer.next();
     expectEq({TokenType::Comma}, lexer.currentToken());
     lexer.next();
-    expectEq({TokenType::Value, "hello world"}, lexer.currentToken());
+    expectEq({TokenType::StringValue, "hello world"}, lexer.currentToken());
     lexer.next();
     expectEq({TokenType::Comma}, lexer.currentToken());
     lexer.next();
@@ -344,4 +345,125 @@ TEST_F(TestConversionHelpersLexer, getsCorrectCurrentTokenEachTimeAfterNextIsCal
     expectEq({TokenType::RightArrayBrace}, lexer.currentToken());
     lexer.next();
     expectEq({TokenType::Eof}, lexer.currentToken());
+}
+
+TEST_F(TestConversionHelpersLexer,
+    getNextTokenWithCorrentExpectedTokenTypeForStringValueDoesNotThrow)
+{
+    auto json_text = "\"hello\"";
+
+    auto lexer = Lexer(json_text);
+    lexer.next(TokenType::StringValue);
+}
+
+TEST_F(TestConversionHelpersLexer,
+    getNextTokenForStringValueWhenExpectingRightDocBraceThrowsWithHelpfulMessage)
+{
+    auto json_text = "\"hello\"";
+    auto expected_token = TokenType::RightDocumentBrace;
+    auto lexer = Lexer(json_text);
+    EXPECT_THROW({
+        try
+        {
+            lexer.next(expected_token);
+        }
+        catch(Json::ParseError & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("line 1, column 1"));
+            EXPECT_THAT(err_msg, HasSubstr(toString(expected_token)));
+            EXPECT_THAT(err_msg, HasSubstr("'\"hello\"'"));
+            throw;
+        }
+    }, Json::ParseError);
+}
+
+TEST_F(TestConversionHelpersLexer,
+    getNextTokenForIntValueWhenExpectingRightArrayBraceThrowsWithHelpfulMessage)
+{
+    auto json_text = "1245";
+    auto expected_token = TokenType::RightArrayBrace;
+    auto lexer = Lexer(json_text);
+    EXPECT_THROW({
+        try
+        {
+            lexer.next(expected_token);
+        }
+        catch(Json::ParseError & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("line 1, column 1"));
+            EXPECT_THAT(err_msg, HasSubstr(toString(expected_token)));
+            EXPECT_THAT(err_msg, HasSubstr("'1245'"));
+            throw;
+        }
+    }, Json::ParseError);
+}
+
+TEST_F(TestConversionHelpersLexer,
+    getNextTokenForIntValueWithWhitespaceWhenExpectingRightArrayBraceThrowsWithHelpfulMessage)
+{
+    auto json_text = "   1245";
+    auto expected_token = TokenType::RightArrayBrace;
+    auto lexer = Lexer(json_text);
+    EXPECT_THROW({
+        try
+        {
+            lexer.next(expected_token);
+        }
+        catch(Json::ParseError & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("line 1, column 4"));
+            EXPECT_THAT(err_msg, HasSubstr(toString(expected_token)));
+            EXPECT_THAT(err_msg, HasSubstr("'1245'"));
+            throw;
+        }
+    }, Json::ParseError);
+}
+
+TEST_F(TestConversionHelpersLexer,
+    getNextTokenForIntValueWithWhitspaceAndNewLineWhenExpectingRightArrayBraceThrowsWithHelpfulMessage)
+{
+    auto json_text = " \n \n \n     1245";
+    auto expected_token = TokenType::RightArrayBrace;
+    auto lexer = Lexer(json_text);
+    EXPECT_THROW({
+        try
+        {
+            lexer.next(expected_token);
+        }
+        catch(Json::ParseError & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("line 4, column 6"));
+            EXPECT_THAT(err_msg, HasSubstr(toString(expected_token)));
+            EXPECT_THAT(err_msg, HasSubstr("'1245'"));
+            throw;
+        }
+    }, Json::ParseError);
+}
+
+TEST_F(TestConversionHelpersLexer,
+    getNextTokenForIntValueInArrayWithWhenExpectingLeftArrayBraceThrowsWithHelpfulMessage)
+{
+    auto json_text = "[1, 2, 3, 4,";
+    auto expected_token = TokenType::RightArrayBrace;
+    auto lexer = Lexer(json_text);
+    for(auto i=0; i<8; ++i)
+        lexer.next();
+    EXPECT_THROW({
+        try
+        {
+            lexer.next(expected_token);
+        }
+        catch(Json::ParseError & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("line 1, column 12"));
+            EXPECT_THAT(err_msg, HasSubstr(toString(expected_token)));
+            EXPECT_THAT(err_msg, HasSubstr("','"));
+            throw;
+        }
+    }, Json::ParseError);
 }

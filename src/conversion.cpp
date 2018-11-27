@@ -93,7 +93,7 @@ Tree fromString(std::string const& json_string)
     {
         //std::cout << ConversionHelpers::toString(token) << std::endl;
 
-        if(token.type == TokenType::Value)
+        if(token.type == TokenType::Value || token.type == TokenType::StringValue)
         {
             auto field = token.value.get<std::string>();
             lexer.next();
