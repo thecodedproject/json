@@ -90,6 +90,9 @@ Tree(T const& value);
 ```
 define the copy constructor for Tree??
 
+
+Also the error messages created from this `catch all` constructor are very nasty - it's always link time errors!
+
 ### Issue with const-ness of field values in tree
 
 Currently field values in a tree and not const; therefore when iterating over a tree they could be changed. I'm not sure if this is desired behvaiour?

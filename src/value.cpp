@@ -1,5 +1,7 @@
 #include <json/value.hpp>
 
+#include <json/conversion_helpers/to_json_text.hpp>
+
 namespace CodedProject
 {
 namespace Json
@@ -8,6 +10,23 @@ namespace Json
 std::string toString(Value const& v)
 {
     return v.objectAsPrintableString();
+}
+
+std::string toString(Value::Type type)
+{
+    switch(type)
+    {
+        case Value::Type::String:
+            return "String";
+        case Value::Type::Integer:
+            return "Integer";
+        case Value::Type::Bool:
+            return "Bool";
+        case Value::Type::Float:
+            return "Float";
+        case Value::Type::Null:
+            return "Null";
+    }
 }
 
 Value::Value() = default;
@@ -119,23 +138,9 @@ bool Value::get() const
 
 std::string Value::objectAsPrintableString() const
 {
-    switch(type_)
-    {
-        case Type::Integer:
-            return "Value(" + std::to_string(integer_value_) + ", Integer)";
-        case Type::Bool:
-            if(bool_value_)
-                return "Value(true, Bool)";
-            else
-                return "Value(false, Bool)";
-        case Type::String:
-            return "Value(\"" + string_value_ + "\", String)";
-        case Type::Float:
-            return "Value(" + std::to_string(float_value_) + ", Float)";
-        case Type::Null:
-        default:
-            return "Value(Null)";
-    }
+    return "Value(" +
+        ConversionHelpers::toJsonText(*this) + "," +
+        toString(type()) + ")";
 }
 
 }

@@ -58,5 +58,7 @@ private:
     bool bool_value_ = {};
 };
 
+std::string toString(Value::Type type);
+
 }
 }

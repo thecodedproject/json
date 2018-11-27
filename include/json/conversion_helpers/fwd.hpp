@@ -1,13 +1,14 @@
 #pragma once
 
-#include <json/conversion_helpers/fwd.hpp>
-
 namespace CodedProject
 {
 namespace Json
 {
+namespace ConversionHelpers
+{
 
-class Value;
+struct Token;
 
+}
 }
 }

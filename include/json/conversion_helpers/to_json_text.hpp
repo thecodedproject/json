@@ -13,6 +13,8 @@ namespace ConversionHelpers
 
 std::string toJsonText(Value const& v);
 
+std::string toJsonText(Token const& t);
+
 }
 }
 }

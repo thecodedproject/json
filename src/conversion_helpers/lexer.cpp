@@ -3,7 +3,7 @@
 #include <functional>
 #include <map>
 
-#include <iostream>
+#include <json/conversion_helpers/to_json_text.hpp>
 
 namespace CodedProject
 {
@@ -174,22 +174,7 @@ std::string Lexer::tokenAsJsonText(Token const& token) const
             return "StartOfFile";
         case TokenType::StringValue:
         case TokenType::Value:
-            switch(token.value.type())
-            {
-                case Value::Type::Integer:
-                    return std::to_string(token.value.get<int>());
-                case Value::Type::Bool:
-                    if(token.value.get<bool>())
-                        return "true";
-                    else
-                        return "false";
-                case Value::Type::String:
-                    return "\"" + token.value.get<std::string>() + "\"";
-                case Value::Type::Float:
-                    return std::to_string(token.value.get<float>());
-                case Value::Type::Null:
-                    return "null";
-            }
+            return toJsonText(token.value);
     }
 }
 
