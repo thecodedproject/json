@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include <json/conversion_helpers/token_type.hpp>
 #include <json/value.hpp>
 
 namespace CodedProject
@@ -10,20 +11,6 @@ namespace Json
 {
 namespace ConversionHelpers
 {
-
-enum class TokenType
-{
-    LeftArrayBrace,
-    RightArrayBrace,
-    LeftDocumentBrace,
-    RightDocumentBrace,
-    Colon,
-    Comma,
-    Value,
-    StringValue,
-    Eof,
-    StartOfFile
-};
 
 struct Token
 {

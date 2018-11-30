@@ -1,33 +1,14 @@
 #pragma once
 
-#include <list>
+#include <functional>
 #include <string>
 
 #include <json/conversion_helpers/token.hpp>
-#include <json/value.hpp>
 
 namespace CodedProject
 {
 namespace Json
 {
-
-class ParseError : public std::runtime_error
-{
-public:
-    ParseError(
-        std::string const& actual_token_string,
-        ConversionHelpers::TokenType const expected_token_type,
-        int const error_line,
-        int const error_column)
-    : std::runtime_error(
-        "line " + std::to_string(error_line) +
-        ", column " + std::to_string(error_column) +
-        " " + toString(expected_token_type) +
-        " '" + actual_token_string + "'")
-    {
-    }
-};
-
 namespace ConversionHelpers
 {
 
@@ -38,9 +19,11 @@ public:
 
     Token next();
 
-    Token next(TokenType expectedTokenType);
+    Token next(TokenType expected_token_type);
 
     Token currentToken();
+
+    TokenType peekNextTokenType(int num_tokens_to_peek_forward=1);
 
 private:
 
@@ -48,14 +31,19 @@ private:
 
     Token handleNextToken();
 
-    Token advanceCurrentCharAndReturnToken(
+    Token checkTokenStringIsValidAndAdvanceCurrentChar(
         std::pair<Token, size_t> const& token_and_length);
 
     Token handleStringValue();
 
     Token handleNumberValue();
 
-    std::string tokenAsJsonText(Token const& token) const;
+    void advanceCurrentCharButNotBeyondEnd(size_t amount_to_advance=1);
+
+    void advanceCurrentCharButNotBeyondEndWhile(
+        std::function<bool(char)> while_predicate);
+
+    std::pair<int, int> lineAndColumnOfChar(std::string::const_iterator start_char) const;
 
     std::string json_text_ = {};
     std::string::const_iterator current_char_ = {};

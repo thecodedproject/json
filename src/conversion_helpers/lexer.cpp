@@ -4,6 +4,7 @@
 #include <map>
 
 #include <json/conversion_helpers/to_json_text.hpp>
+#include <json/parse_error.hpp>
 
 namespace CodedProject
 {
@@ -26,34 +27,20 @@ Token Lexer::next()
     return current_token_;
 }
 
-Token Lexer::next(TokenType expectedTokenType)
+Token Lexer::next(TokenType expected_token_type)
 {
     auto actual_token = next();
-    if(expectedTokenType != actual_token.type)
+    if(expected_token_type != actual_token.type)
     {
-        auto last_token_start_column = 1;
-        auto last_token_start_line = 1;
-        for(auto it=std::cbegin(json_text_);
-            it!=last_token_start_char_;
-            ++it)
+        if(!(expected_token_type == TokenType::Value &&
+            actual_token.type == TokenType::StringValue))
         {
-            if(*it == '\n')
-            {
-                last_token_start_column = 1;
-                ++last_token_start_line;
-            }
-            else
-            {
-                ++last_token_start_column;
-            }
-
+            throw ParseError::expectedToken(
+                toJsonText(current_token_),
+                expected_token_type,
+                lineAndColumnOfChar(last_token_start_char_)
+            );
         }
-
-        throw Json::ParseError(
-            tokenAsJsonText(current_token_),
-            expectedTokenType,
-            last_token_start_line,
-            last_token_start_column);
     }
 
     return actual_token;
@@ -62,6 +49,23 @@ Token Lexer::next(TokenType expectedTokenType)
 Token Lexer::currentToken()
 {
     return current_token_;
+}
+
+TokenType Lexer::peekNextTokenType(int num_tokens_to_peek_forward)
+{
+    auto current_char = current_char_;
+    auto last_token_start_char = last_token_start_char_;
+    auto current_token = current_token_;
+
+    auto next_token = Token{};
+    for(auto i=0; i<num_tokens_to_peek_forward; ++i)
+        next_token = next();
+
+    current_char_ = current_char;
+    last_token_start_char_ = last_token_start_char;
+    current_token_ = current_token;
+
+    return next_token.type;
 }
 
 void Lexer::skipWhitespace()
@@ -74,8 +78,6 @@ void Lexer::skipWhitespace()
 
 Token Lexer::handleNextToken()
 {
-    auto a = std::bind(&Lexer::advanceCurrentCharAndReturnToken, this, Token{TokenType::LeftArrayBrace});
-
     auto char_tokens_and_length = std::map<char,std::pair<Token, size_t>>{
         {'[', {{TokenType::LeftArrayBrace},1}},
         {']', {{TokenType::RightArrayBrace},1}},
@@ -94,7 +96,7 @@ Token Lexer::handleNextToken()
     }
     else if(char_tokens_and_length.count(*current_char_))
     {
-        return advanceCurrentCharAndReturnToken(
+        return checkTokenStringIsValidAndAdvanceCurrentChar(
             char_tokens_and_length[*current_char_]);
     }
     else if(*current_char_ == '"')
@@ -107,10 +109,22 @@ Token Lexer::handleNextToken()
     }
 }
 
-Token Lexer::advanceCurrentCharAndReturnToken(
+Token Lexer::checkTokenStringIsValidAndAdvanceCurrentChar(
     std::pair<Token, size_t> const& token_and_length)
 {
-    std::advance(current_char_, token_and_length.second);
+    auto token_start_char = current_char_;
+    advanceCurrentCharButNotBeyondEnd(token_and_length.second);
+    auto expected_token_string = toJsonText(token_and_length.first);
+    auto actual_token_string = std::string(token_start_char, current_char_);
+
+    if(expected_token_string != actual_token_string)
+    {
+        throw ParseError::invalidToken(
+            actual_token_string,
+            lineAndColumnOfChar(token_start_char)
+        );
+    }
+
     return token_and_length.first;
 }
 
@@ -120,25 +134,31 @@ Token Lexer::handleStringValue()
 
     auto string_start_char = current_char_;
 
-    while(*current_char_!='"')
+    advanceCurrentCharButNotBeyondEndWhile([](auto c){
+        return c!='"';
+    });
+
+    if(current_char_ == std::end(json_text_))
     {
-        ++current_char_;
+        throw ParseError::unterminatedString(
+            {string_start_char, current_char_},
+            lineAndColumnOfChar(string_start_char)
+        );
     }
 
     auto value_string = std::string(string_start_char, current_char_);
 
-    return advanceCurrentCharAndReturnToken(
-        {{TokenType::StringValue, value_string},1});
+    std::advance(current_char_, 1);
+    return {TokenType::StringValue, value_string};
 }
 
 Token Lexer::handleNumberValue()
 {
     auto value_start = current_char_;
 
-    while(std::string("-0123456789.").find(*current_char_)!=std::string::npos)
-    {
-        ++current_char_;
-    }
+    advanceCurrentCharButNotBeyondEndWhile([](auto c){
+        return std::string("-0123456789.").find(c)!=std::string::npos;
+    });
 
     auto value_string = std::string(value_start, current_char_);
 
@@ -152,30 +172,49 @@ Token Lexer::handleNumberValue()
     }
 }
 
-std::string Lexer::tokenAsJsonText(Token const& token) const
+void Lexer::advanceCurrentCharButNotBeyondEnd(size_t amount_to_advance)
 {
-    switch(token.type)
+    if(std::distance(current_char_, std::cend(json_text_)) < amount_to_advance)
     {
-        case TokenType::LeftArrayBrace:
-            return "[";
-        case TokenType::RightArrayBrace:
-            return "]";
-        case TokenType::LeftDocumentBrace:
-            return "{";
-        case TokenType::RightDocumentBrace:
-            return "}";
-        case TokenType::Colon:
-            return ":";
-        case TokenType::Comma:
-            return ",";
-        case TokenType::Eof:
-            return "Eof";
-        case TokenType::StartOfFile:
-            return "StartOfFile";
-        case TokenType::StringValue:
-        case TokenType::Value:
-            return toJsonText(token.value);
+        current_char_=std::end(json_text_);
     }
+    else
+    {
+        std::advance(current_char_, amount_to_advance);
+    }
+}
+
+void Lexer::advanceCurrentCharButNotBeyondEndWhile(
+    std::function<bool(char)> while_predicate)
+{
+    while(while_predicate(*current_char_)
+        &&current_char_!=std::end(json_text_))
+    {
+        ++current_char_;
+    }
+}
+
+std::pair<int, int> Lexer::lineAndColumnOfChar(
+    std::string::const_iterator start_char) const
+{
+    auto char_column = 1;
+    auto char_line = 1;
+    for(auto it=std::cbegin(json_text_);
+        it!=start_char;
+        ++it)
+    {
+        if(*it == '\n')
+        {
+            char_column = 1;
+            ++char_line;
+        }
+        else
+        {
+            ++char_column;
+        }
+
+    }
+    return {char_line, char_column};
 }
 
 }

@@ -7,6 +7,7 @@ namespace Json
 namespace ConversionHelpers
 {
 
+class Lexer;
 struct Token;
 
 }

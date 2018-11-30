@@ -2,6 +2,8 @@
 
 #include <json/conversion_helpers/lexer.hpp>
 
+#include <json/parse_error.hpp>
+
 using namespace CodedProject;
 using namespace CodedProject::Json::ConversionHelpers;
 using namespace ::testing;
@@ -357,6 +359,46 @@ TEST_F(TestConversionHelpersLexer,
 }
 
 TEST_F(TestConversionHelpersLexer,
+    getNextTokenWhichIsStringValueWhenExpectingValueDoesNotThrow)
+{
+    auto json_text = "\"hello\"";
+
+    auto lexer = Lexer(json_text);
+    lexer.next(TokenType::Value);
+}
+
+TEST_F(TestConversionHelpersLexer,
+    getNextTokenWhichIsBoolWhenExpectingValueDoesNotThrow)
+{
+    auto json_text = "true";
+
+    auto lexer = Lexer(json_text);
+    lexer.next(TokenType::Value);
+}
+
+TEST_F(TestConversionHelpersLexer,
+    getNextTokenForValueWhenExpectingStringValueThrowsWithHelpfulMessage)
+{
+    auto json_text = "123";
+    auto expected_token = TokenType::StringValue;
+    auto lexer = Lexer(json_text);
+    EXPECT_THROW({
+        try
+        {
+            lexer.next(expected_token);
+        }
+        catch(Json::ParseError & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("line 1, column 1"));
+            EXPECT_THAT(err_msg, HasSubstr(toString(expected_token)));
+            EXPECT_THAT(err_msg, HasSubstr("'123'"));
+            throw;
+        }
+    }, Json::ParseError);
+}
+
+TEST_F(TestConversionHelpersLexer,
     getNextTokenForStringValueWhenExpectingRightDocBraceThrowsWithHelpfulMessage)
 {
     auto json_text = "\"hello\"";
@@ -445,7 +487,7 @@ TEST_F(TestConversionHelpersLexer,
 }
 
 TEST_F(TestConversionHelpersLexer,
-    getNextTokenForIntValueInArrayWithWhenExpectingLeftArrayBraceThrowsWithHelpfulMessage)
+    getNextTokenForIntValueInArrayWithWhenExpectingRightArrayBraceThrowsWithHelpfulMessage)
 {
     auto json_text = "[1, 2, 3, 4,";
     auto expected_token = TokenType::RightArrayBrace;
@@ -466,4 +508,264 @@ TEST_F(TestConversionHelpersLexer,
             throw;
         }
     }, Json::ParseError);
+}
+
+TEST_F(TestConversionHelpersLexer,
+    getNextTokenForCommaValueInDocumentWithWhenExpectingRightDocumentBraceThrowsWithHelpfulMessage)
+{
+    auto json_text = "{\n\"hello\": \"world\"\n\"close_doc\"";
+    auto expected_token = TokenType::RightDocumentBrace;
+    auto lexer = Lexer(json_text);
+    for(auto i=0; i<4; ++i)
+        lexer.next();
+    EXPECT_THROW({
+        try
+        {
+            lexer.next(expected_token);
+        }
+        catch(Json::ParseError & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("line 3, column 1"));
+            EXPECT_THAT(err_msg, HasSubstr(toString(expected_token)));
+            EXPECT_THAT(err_msg, HasSubstr("'\"close_doc\"'"));
+            throw;
+        }
+    }, Json::ParseError);
+}
+
+TEST_F(TestConversionHelpersLexer,
+    getNextTokenForInvalidTokenWhichStartsWithTThrowsErrorWithHelpfulMessage)
+{
+    auto json_text = "tree";
+    auto lexer = Lexer(json_text);
+    EXPECT_THROW({
+        try
+        {
+            lexer.next();
+        }
+        catch(Json::ParseError & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("Invalid token"));
+            EXPECT_THAT(err_msg, HasSubstr("line 1, column 1"));
+            EXPECT_THAT(err_msg, HasSubstr("tree"));
+            throw;
+        }
+    }, Json::ParseError);
+}
+
+TEST_F(TestConversionHelpersLexer,
+    getNextTokenForInvalidTokenWhichStartsWithTAndShorterThanTrueThrowsErrorWithHelpfulMessage)
+{
+    auto json_text = " te";
+    auto lexer = Lexer(json_text);
+    EXPECT_THROW({
+        try
+        {
+            lexer.next();
+        }
+        catch(Json::ParseError & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("Invalid token"));
+            EXPECT_THAT(err_msg, HasSubstr("line 1, column 2"));
+            EXPECT_THAT(err_msg, HasSubstr("te"));
+            throw;
+        }
+    }, Json::ParseError);
+}
+
+TEST_F(TestConversionHelpersLexer,
+    getNextTokenForInvalidTokenWhichStartsWithFInsideArrayThrowsErrorWithHelpfulMessage)
+{
+    auto json_text = "[1, 2, ffffffff";
+    auto lexer = Lexer(json_text);
+    lexer.next();
+    lexer.next();
+    lexer.next();
+    lexer.next();
+    lexer.next();
+    EXPECT_THROW({
+        try
+        {
+            lexer.next();
+        }
+        catch(Json::ParseError & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("Invalid token"));
+            EXPECT_THAT(err_msg, HasSubstr("line 1, column 8"));
+            EXPECT_THAT(err_msg, HasSubstr("fffff"));
+            throw;
+        }
+    }, Json::ParseError);
+}
+
+TEST_F(TestConversionHelpersLexer,
+    getNextTokenForInvalidTokenInsideDictWhichStartsWithNThrowsErrorWithHelpfulMessage)
+{
+    auto json_text = "{\n\"a\": number}";
+    auto lexer = Lexer(json_text);
+    lexer.next();
+    lexer.next();
+    lexer.next();
+    EXPECT_THROW({
+        try
+        {
+            lexer.next();
+        }
+        catch(Json::ParseError & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("Invalid token"));
+            EXPECT_THAT(err_msg, HasSubstr("line 2, column 6"));
+            EXPECT_THAT(err_msg, HasSubstr("numb"));
+            throw;
+        }
+    }, Json::ParseError);
+}
+
+TEST_F(TestConversionHelpersLexer,
+    getNextTokenForStringWithinArrayWhichIsLongerThan5CharsAndNeverTerminated)
+{
+    auto json_text = "[\n1,\ntrue,\n\"unterminated";
+    auto lexer = Lexer(json_text);
+    lexer.next();
+    lexer.next();
+    lexer.next();
+    lexer.next();
+    lexer.next();
+    EXPECT_THROW({
+        try
+        {
+            lexer.next();
+        }
+        catch(Json::ParseError & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("Unterminated string literal"));
+            EXPECT_THAT(err_msg, HasSubstr("'unter...'"));
+            EXPECT_THAT(err_msg, HasSubstr("starting at"));
+            EXPECT_THAT(err_msg, HasSubstr("line 4, column 2"));
+            throw;
+        }
+    }, Json::ParseError);
+}
+
+TEST_F(TestConversionHelpersLexer,
+    getNextTokenForStringWithinDocumentWhichIsShorterThan5CharsAndNeverTerminated)
+{
+    auto json_text = "{\n\"1\": true,\n\"2\": \"some";
+    auto lexer = Lexer(json_text);
+    lexer.next();
+    lexer.next();
+    lexer.next();
+    lexer.next();
+    lexer.next();
+    lexer.next();
+    lexer.next();
+    EXPECT_THROW({
+        try
+        {
+            lexer.next();
+        }
+        catch(Json::ParseError & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("Unterminated string literal"));
+            EXPECT_THAT(err_msg, HasSubstr("'some'"));
+            EXPECT_THAT(err_msg, HasSubstr("starting at"));
+            EXPECT_THAT(err_msg, HasSubstr("line 3, column 7"));
+            throw;
+        }
+    }, Json::ParseError);
+}
+
+TEST_F(TestConversionHelpersLexer, peekNextTokenTypeWhenNextTokenIsStringValue)
+{
+    auto json_text = "\"some\"";
+    auto lexer = Lexer(json_text);
+    EXPECT_EQ(TokenType::StringValue, lexer.peekNextTokenType());
+}
+
+TEST_F(TestConversionHelpersLexer, peekNextTokenTypeWhenNextTokenIsValue)
+{
+    auto json_text = "\"some\", true";
+    auto lexer = Lexer(json_text);
+    lexer.next();
+    lexer.next();
+    EXPECT_EQ(TokenType::Value, lexer.peekNextTokenType());
+}
+
+TEST_F(TestConversionHelpersLexer, peekNextTokenTypeWhenNextTokenIsComma)
+{
+    auto json_text = "\"some\",";
+    auto lexer = Lexer(json_text);
+    lexer.next();
+    EXPECT_EQ(TokenType::Comma, lexer.peekNextTokenType());
+}
+
+TEST_F(TestConversionHelpersLexer, peekNextTokenTypeAndGetNextTokenReturnsCorrectTokenForComma)
+{
+    auto json_text = "\"some\",";
+    auto lexer = Lexer(json_text);
+    lexer.next();
+    ASSERT_EQ(TokenType::Comma, lexer.peekNextTokenType());
+    expectNextTokenEq({TokenType::Comma}, lexer);
+}
+
+TEST_F(TestConversionHelpersLexer, peekNextTokenTypeAndGetNextTokenReturnsCorrectTokenForValue)
+{
+    auto json_text = "\"some\", 123";
+    auto lexer = Lexer(json_text);
+    lexer.next();
+    lexer.next();
+    ASSERT_EQ(TokenType::Value, lexer.peekNextTokenType());
+    expectNextTokenEq({TokenType::Value, 123}, lexer);
+}
+
+TEST_F(TestConversionHelpersLexer, peekNextButOneTokenTypeWhenNextTokenIsColon)
+{
+    auto json_text = "\"some\" true:";
+    auto lexer = Lexer(json_text);
+    lexer.next();
+    EXPECT_EQ(TokenType::Colon, lexer.peekNextTokenType(2));
+}
+
+TEST_F(TestConversionHelpersLexer, peekNextButOneTokenTypeWhenNextTokenIsStringValue)
+{
+    auto json_text = "true: \"some\"";
+    auto lexer = Lexer(json_text);
+    lexer.next();
+    EXPECT_EQ(TokenType::StringValue, lexer.peekNextTokenType(2));
+}
+
+TEST_F(TestConversionHelpersLexer, peekNextButOneTokenTypeWhenNextTokenIsValue)
+{
+    auto json_text = "true: 1234";
+    auto lexer = Lexer(json_text);
+    lexer.next();
+    EXPECT_EQ(TokenType::Value, lexer.peekNextTokenType(2));
+}
+
+TEST_F(TestConversionHelpersLexer, peekNextButOneTokenTypeAndGetNextTokenReturnsCorrectTokenForComma)
+{
+    auto json_text = "\"some\", true, false";
+    auto lexer = Lexer(json_text);
+    lexer.next();
+    ASSERT_EQ(TokenType::Value, lexer.peekNextTokenType(2));
+    expectNextTokenEq({TokenType::Comma}, lexer);
+}
+
+TEST_F(TestConversionHelpersLexer, callNextWhenAtEofRepeatedlyReturnsEof)
+{
+    auto json_text = "\"some\"";
+    auto lexer = Lexer(json_text);
+    lexer.next();
+    expectEndOfFile(lexer);
+    expectEndOfFile(lexer);
+    expectEndOfFile(lexer);
+    expectEndOfFile(lexer);
+    expectEndOfFile(lexer);
 }

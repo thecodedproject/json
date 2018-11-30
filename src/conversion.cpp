@@ -14,7 +14,21 @@ namespace Json
 
 // ---
 
-//json_expression: document | array | VALUE
+//json_expression: document | array | VALUE | STRING_VALUE
+
+//document: LEFT_DOCUMENT_BRACE STRING_VALUE COLON json_expression (COMMA STRING_VALUE json_expression)* RIGHT_DOCUMENT_BRACE
+
+//array: LEFT_ARRAY_BRACE json_expression (COMMA expression_list)* RIGHT_ARRAY_BRACE
+
+//array_list:
+
+//document_list:
+
+
+
+
+
+//json_expression: document | array | VALUE | STRING_VALUE
 
 //document: LEFT_DOCUMENT_BRACE expression_list RIGHT_DOCUMENT_BRACE
 
@@ -24,7 +38,7 @@ namespace Json
 
 //expression: field_value_expression | json_expression
 
-//field_value_expression: FIELD_VALUE COLON json_expression
+//field_value_expression: STRING_VALUE COLON json_expression
 
 
 /*
