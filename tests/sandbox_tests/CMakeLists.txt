@@ -1,5 +1,6 @@
 
 set(target_SRC
+    test_read_json_from_file.cpp
     test_template_value.cpp
 )
 

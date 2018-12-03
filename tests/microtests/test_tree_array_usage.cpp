@@ -50,7 +50,7 @@ TEST_F(TestTreeArrayUsage, tryToAccessArrayIndexOnEmptyTreeThrowsHelpfulError)
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("array"));
             EXPECT_THAT(err_msg, HasSubstr("operator[] (size_t)"));
-            EXPECT_THAT(err_msg, HasSubstr("uninitalised Tree"));
+            EXPECT_THAT(err_msg, HasSubstr("uninitialised"));
             throw;
         }
     }, Json::Tree::IncorrectCallForType);

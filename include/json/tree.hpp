@@ -27,11 +27,21 @@ public:
         }
     };
 
+    enum class Type
+    {
+        Array,
+        Document,
+        Value,
+        Uninitialised
+    };
+
     typedef std::vector<std::pair<std::string, Tree>>::iterator iterator;
     typedef std::vector<std::pair<std::string, Tree>>::const_iterator const_iterator;
     typedef std::vector<std::pair<std::string, Tree>>::size_type size_type;
 
     Tree();
+
+    Tree(Type type);
 
     template <typename T>
     Tree(T const& value);
@@ -87,9 +97,7 @@ private:
 
     void throwIncorrectCallIfNotDocument(std::string function_signature) const;
 
-    bool is_array_ = false;
-    bool is_document_ = false;
-    bool is_value_ = false;
+    Type type_ = Type::Uninitialised;
 
     std::vector<std::pair<std::string, Tree>> values_ = {};
     std::map<std::string, size_t> field_indexes_ = {};
@@ -98,7 +106,7 @@ private:
 
 template <typename T>
 Tree::Tree(T const& value)
-: is_value_(true),
+: type_(Type::Value),
   value_(value)
 {
 }
@@ -108,6 +116,8 @@ T Tree::get() const
 {
     return value_.get<T>();
 }
+
+std::string toString(Tree::Type type);
 
 }
 }

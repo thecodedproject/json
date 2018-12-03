@@ -59,9 +59,20 @@ Builder?
 
 * Does not allow duplicate fields to be inserted into a document (although I think that this may be valid JSON)
 
+## Grammers:
+
+```
+json_expression: document | array | VALUE | STRING_VALUE
+
+document: LEFT_DOCUMENT_BRACE STRING_VALUE COLON json_expression (COMMA STRING_VALUE json_expression)* RIGHT_DOCUMENT_BRACE
+
+array: LEFT_ARRAY_BRACE json_expression (COMMA expression_list)* RIGHT_ARRAY_BRACE
+```
 
 
 ## Future improvements
+
+### Order independent comparison (of documents) and sort functions (for documents only)
 
 ### Handle escpaed double quotes within strings
 

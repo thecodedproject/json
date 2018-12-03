@@ -36,6 +36,28 @@ TEST_F(TestGrammer, jsonExpressionWithIntValue)
     EXPECT_EQ(expected, actual);
 }
 
+TEST_F(TestGrammer, jsonExpressionWithEmptyDocument)
+{
+    auto string_to_parse = "{}";
+    auto lexer = Lexer(string_to_parse);
+
+    auto expected = Tree(Tree::Type::Document);
+
+    auto actual = Grammer::jsonExpression(lexer);
+    EXPECT_EQ(expected, actual);
+}
+
+TEST_F(TestGrammer, jsonExpressionWithEmptyArray)
+{
+    auto string_to_parse = "[]";
+    auto lexer = Lexer(string_to_parse);
+
+    auto expected = Tree(Tree::Type::Array);
+
+    auto actual = Grammer::jsonExpression(lexer);
+    EXPECT_EQ(expected, actual);
+}
+
 TEST_F(TestGrammer, jsonExpressionWithDocumentOfSingleValue)
 {
     auto string_to_parse = "{\"a\": \"some_value\"}";
@@ -242,6 +264,28 @@ TEST_F(TestGrammer, documentThrowsParseErrorIfSecondTokenIsNotStringValue)
             EXPECT_THAT(err_msg, HasSubstr("StringValue"));
             EXPECT_THAT(err_msg, HasSubstr("'123'"));
             EXPECT_THAT(err_msg, HasSubstr("line 1, column 2"));
+            throw;
+        }
+    }, ParseError);
+}
+
+TEST_F(TestGrammer, documentThrowsParseErrorRightDocBracePreceededByComma)
+{
+    auto string_to_parse = "{\"123\": true,}";
+    auto lexer = Lexer(string_to_parse);
+
+    EXPECT_THROW({
+        try
+        {
+            auto t = Grammer::document(lexer);
+        }
+        catch(ParseError & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("Expected"));
+            EXPECT_THAT(err_msg, HasSubstr("StringValue"));
+            EXPECT_THAT(err_msg, HasSubstr("'}'"));
+            EXPECT_THAT(err_msg, HasSubstr("line 1, column 14"));
             throw;
         }
     }, ParseError);
@@ -486,6 +530,50 @@ TEST_F(TestGrammer, arrayThrowsParseErrorIfThridTokenIsNotCommaOrRightArrayBrace
             EXPECT_THAT(err_msg, HasSubstr("RightArrayBrace"));
             EXPECT_THAT(err_msg, HasSubstr("'}'"));
             EXPECT_THAT(err_msg, HasSubstr("line 1, column 7"));
+            throw;
+        }
+    }, ParseError);
+}
+
+TEST_F(TestGrammer, arrayThrowsParseErrorIfRightArrayBraceIsPreceededByComma)
+{
+    auto string_to_parse = "[true,false,]";
+    auto lexer = Lexer(string_to_parse);
+
+    EXPECT_THROW({
+        try
+        {
+            auto t = Grammer::array(lexer);
+        }
+        catch(ParseError & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("Expected"));
+            EXPECT_THAT(err_msg, HasSubstr("Value"));
+            EXPECT_THAT(err_msg, HasSubstr("']'"));
+            EXPECT_THAT(err_msg, HasSubstr("line 1, column 13"));
+            throw;
+        }
+    }, ParseError);
+}
+
+TEST_F(TestGrammer, arrayThrowsParseErrorIfRightArrayBraceIsPreceededByColon)
+{
+    auto string_to_parse = "[true,false:]";
+    auto lexer = Lexer(string_to_parse);
+
+    EXPECT_THROW({
+        try
+        {
+            auto t = Grammer::array(lexer);
+        }
+        catch(ParseError & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("Expected"));
+            EXPECT_THAT(err_msg, HasSubstr("RightArrayBrace"));
+            EXPECT_THAT(err_msg, HasSubstr("':'"));
+            EXPECT_THAT(err_msg, HasSubstr("line 1, column 12"));
             throw;
         }
     }, ParseError);

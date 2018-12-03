@@ -28,6 +28,48 @@ TEST_F(TestTreeComparison, defaultConstructedTreesCompareEqual)
     expectComparesEqual(t, u);
 }
 
+TEST_F(TestTreeComparison, emptyDocumentTreesCompareEqual)
+{
+    auto t = Json::Tree(Json::Tree::Type::Document);
+    auto u = Json::Tree(Json::Tree::Type::Document);
+    expectComparesEqual(t, u);
+}
+
+TEST_F(TestTreeComparison, emptyArrayTreesCompareEqual)
+{
+    auto t = Json::Tree(Json::Tree::Type::Array);
+    auto u = Json::Tree(Json::Tree::Type::Array);
+    expectComparesEqual(t, u);
+}
+
+TEST_F(TestTreeComparison, emptyValuetTreesCompareEqual)
+{
+    auto t = Json::Tree(Json::Tree::Type::Value);
+    auto u = Json::Tree(Json::Tree::Type::Value);
+    expectComparesEqual(t, u);
+}
+
+TEST_F(TestTreeComparison, emptyDocumentAndArrayTreesCompareNotEqual)
+{
+    auto t = Json::Tree(Json::Tree::Type::Document);
+    auto u = Json::Tree(Json::Tree::Type::Array);
+    expectComparesNotEqual(t, u);
+}
+
+TEST_F(TestTreeComparison, emptyValueAndArrayTreesCompareNotEqual)
+{
+    auto t = Json::Tree(Json::Tree::Type::Value);
+    auto u = Json::Tree(Json::Tree::Type::Array);
+    expectComparesNotEqual(t, u);
+}
+
+TEST_F(TestTreeComparison, emptyDocumentAndValueTreesCompareNotEqual)
+{
+    auto t = Json::Tree(Json::Tree::Type::Document);
+    auto u = Json::Tree(Json::Tree::Type::Value);
+    expectComparesNotEqual(t, u);
+}
+
 TEST_F(TestTreeComparison, valueTreesWithTheSameValueCompareEqual)
 {
     auto t = Json::Tree(10);

@@ -11,8 +11,17 @@ namespace Json
 
 Tree::Tree() = default;
 
+Tree::Tree(Type type)
+: type_(type)
+{
+
+}
+
 bool Tree::operator== (Tree const& rhs) const
 {
+    if(type_ != rhs.type_)
+        return false;
+
     if(isDocument() || isArray())
     {
         return values_ == rhs.values_;
@@ -28,17 +37,17 @@ bool Tree::operator!= (Tree const& rhs) const
 
 bool Tree::isArray() const
 {
-    return is_array_;
+    return type_==Type::Array;
 }
 
 bool Tree::isDocument() const
 {
-    return is_document_;
+    return type_==Type::Document;
 }
 
 bool Tree::isValue() const
 {
-    return is_value_;
+    return type_==Type::Value;
 }
 
 Tree::iterator Tree::begin()
@@ -96,7 +105,7 @@ Tree & Tree::operator[] (size_t index)
 
 void Tree::pushBack(Tree subtree)
 {
-    is_array_ = true;
+    type_ = Type::Array;
     values_.push_back({"",subtree});
 }
 
@@ -104,7 +113,7 @@ Tree & Tree::operator[] (std::string const& field)
 {
     throwIncorrectCallIfNotDocument("operator[] (std::string)");
 
-    is_document_ = true;
+    type_ = Type::Document;
     if(!count(field))
     {
         field_indexes_[field] = values_.size();
@@ -147,19 +156,18 @@ Tree::size_type Tree::erase(std::string const& field_name)
 
 Value const& Tree::getValue() const
 {
-    return value_;
+    if(isValue())
+        return value_;
+    else
+        throw IncorrectCallForType(
+            "value function `getValue()`",
+            typeAsString());
+
 }
 
 std::string Tree::typeAsString() const
 {
-    if(isArray())
-        return "array";
-    else if(isDocument())
-        return "document";
-    else if(isValue())
-        return "value";
-    else
-        return "uninitalised Tree";
+    return toString(type_);
 }
 
 bool Tree::isNotDocument() const
@@ -174,6 +182,21 @@ void Tree::throwIncorrectCallIfNotDocument(std::string function_signature) const
         throw IncorrectCallForType(
             "document function `" + function_signature + "`",
             typeAsString());
+    }
+}
+
+std::string toString(Tree::Type type)
+{
+    switch(type)
+    {
+        case Tree::Type::Array:
+            return "array";
+        case Tree::Type::Document:
+            return "document";
+        case Tree::Type::Value:
+            return "value";
+        case Tree::Type::Uninitialised:
+            return "uninitialised";
     }
 }
 

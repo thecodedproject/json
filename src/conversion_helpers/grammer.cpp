@@ -26,8 +26,9 @@ Tree jsonExpression(Lexer & lexer)
     return lexer.next(TokenType::Value).value;
 }
 
-void doUntilNextComma(
+void doForEntireCommaSeperatedList(
     TokenType expected_first_token,
+    TokenType expected_end_token,
     Lexer & lexer,
     std::function<void()> f)
 {
@@ -35,38 +36,44 @@ void doUntilNextComma(
     do
     {
         lexer.next(next_expected_token);
+        if(lexer.peekNextTokenType() == expected_end_token &&
+            next_expected_token == expected_first_token)
+        {
+            break;
+        }
         f();
         next_expected_token = TokenType::Comma;
     } while(lexer.peekNextTokenType() == TokenType::Comma);
+    lexer.next(expected_end_token);
 }
 
 Tree document(Lexer & lexer)
 {
-    auto t = Tree();
-    doUntilNextComma(
+    auto t = Tree(Tree::Type::Document);
+    doForEntireCommaSeperatedList(
         TokenType::LeftDocumentBrace,
+        TokenType::RightDocumentBrace,
         lexer,
         [&t, &lexer]() {
             auto field = lexer.next(TokenType::StringValue);
             lexer.next(TokenType::Colon);
             t[field.value.get<std::string>()] = jsonExpression(lexer);
         });
-    lexer.next(TokenType::RightDocumentBrace);
     return t;
 }
 
 Tree array(Lexer & lexer)
 {
-    auto t = Tree();
-    doUntilNextComma(
+    auto t = Tree(Tree::Type::Array);
+    doForEntireCommaSeperatedList(
         TokenType::LeftArrayBrace,
+        TokenType::RightArrayBrace,
         lexer,
         [&t, &lexer]() {
             t.pushBack(
                 jsonExpression(lexer)
             );
         });
-    lexer.next(TokenType::RightArrayBrace);
     return t;
 }
 
