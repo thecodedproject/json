@@ -3,8 +3,10 @@ set(target_SRC
     conversion_helpers/test_grammer.cpp
     conversion_helpers/test_lexer.cpp
     conversion_helpers/test_to_json_text.cpp
+    conversion_helpers/test_to_json_text_tree_conversion.cpp
     test_builder.cpp
     test_conversion_from_json_string.cpp
+    test_conversion_to_json_string.cpp
     test_tree_array_usage.cpp
     test_tree_comparison.cpp
     test_tree_construction.cpp

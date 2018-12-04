@@ -72,6 +72,16 @@ array: LEFT_ARRAY_BRACE json_expression (COMMA expression_list)* RIGHT_ARRAY_BRA
 
 ## Future improvements
 
+### Const accessors for Tree; e.g. cannot use `operator[](int)` on const Tree.
+
+### Better way to consturct null tree/value (connected with the potentially dodgey template, catch-all constuctor)
+
+### Muddy `toString` statements
+
+There are alot of toString overloads in the `CodedProject::Json` namespace - I feel like they should all do the same thing probably: convert the object to Json (if applicable).
+However some, namely `toString(Value)` converts to a printable string showing the type, not to JSON.
+Potentially rethink this design?
+
 ### Order independent comparison (of documents) and sort functions (for documents only)
 
 ### Handle escpaed double quotes within strings

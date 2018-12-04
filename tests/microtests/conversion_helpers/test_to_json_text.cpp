@@ -129,3 +129,17 @@ TEST_F(TestToJsonText, startOfFileTokenThrowsError)
         toJsonText(t),
         std::runtime_error);
 }
+
+TEST_F(TestToJsonText, ValueTokenTypeThrowsError)
+{
+    EXPECT_THROW(
+        toJsonText(TokenType::Value),
+        std::runtime_error);
+}
+
+TEST_F(TestToJsonText, StringValueTokenTypeThrowsError)
+{
+    EXPECT_THROW(
+        toJsonText(TokenType::StringValue),
+        std::runtime_error);
+}

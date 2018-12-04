@@ -9,5 +9,7 @@ namespace Json
 
 Tree fromString(std::string const& json_string);
 
+std::string toString(Tree const& tree);
+
 }
 }

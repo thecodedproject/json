@@ -7,6 +7,8 @@ namespace CodedProject
 namespace Json
 {
 
+class Builder;
+class Tree;
 class Value;
 
 }

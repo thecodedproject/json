@@ -8,6 +8,7 @@ namespace ConversionHelpers
 {
 
 class Lexer;
+enum class TokenType;
 struct Token;
 
 }

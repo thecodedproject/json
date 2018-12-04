@@ -10,6 +10,11 @@ namespace Json
 namespace ConversionHelpers
 {
 
+std::string toJsonText(Tree const& t)
+{
+    return {};
+}
+
 std::string toJsonText(Value const& v)
 {
     switch(v.type())
@@ -34,6 +39,23 @@ std::string toJsonText(Token const& t)
 {
     switch(t.type)
     {
+        case TokenType::Value:
+        case TokenType::StringValue:
+            return toJsonText(t.value);
+        case TokenType::Eof:
+        case TokenType::StartOfFile:
+            throw std::runtime_error(
+                "ConversionHelpers::toJsonText(Token): Token" +
+                toString(t.type) + " is not JSON serialisable.");
+        default:
+            return toJsonText(t.type);
+    }
+}
+
+std::string toJsonText(TokenType const& type)
+{
+    switch(type)
+    {
         case TokenType::LeftArrayBrace:
             return "[";
         case TokenType::RightArrayBrace:
@@ -48,12 +70,11 @@ std::string toJsonText(Token const& t)
             return ",";
         case TokenType::Value:
         case TokenType::StringValue:
-            return toJsonText(t.value);
         case TokenType::Eof:
         case TokenType::StartOfFile:
             throw std::runtime_error(
-                "ConversionHelpers::toJsonText: Token" +
-                toString(t.type) + " is not JSON serialisable.");
+                "ConversionHelpers::toJsonText(TokenType): Token type" +
+                toString(type) + " cannot be converted to JSON without value.");
     }
 }
 
