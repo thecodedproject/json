@@ -126,3 +126,96 @@ TEST_F(TestTreeArrayUsage, constructDocumentAndTryToGetArrayElementThrowsErrorWi
         }
     }, Json::Tree::IncorrectCallForType);
 }
+
+TEST_F(TestTreeArrayUsage, assignUsingAccessOperatorAndGetValueGivesCorrectValue)
+{
+    auto t = Json::Tree();
+    t.pushBack(std::string("some_value"));
+    t[0] = 123;
+    EXPECT_EQ(123, t[0].get<int>());
+}
+
+TEST_F(TestTreeArrayUsage, pushBackStringIntoArrayAndGetValueWithAtReturnsSameValue)
+{
+    auto t = Json::Tree();
+    t.pushBack(std::string("some_value"));
+    EXPECT_EQ("some_value", t.at(0).get<std::string>());
+}
+
+TEST_F(TestTreeArrayUsage, getMultipleValuesWithAtAccessorReturnsCorrectValues)
+{
+    auto t = Json::Tree();
+    t.pushBack(std::string("some_value"));
+    t.pushBack(true);
+    t.pushBack(234);
+    t.pushBack(23.5f);
+    EXPECT_EQ("some_value", t.at(0).get<std::string>());
+    EXPECT_TRUE(t.at(1).get<bool>());
+    EXPECT_EQ(234, t.at(2).get<int>());
+    EXPECT_FLOAT_EQ(23.5f, t.at(3).get<float>());
+}
+
+TEST_F(TestTreeArrayUsage, assignUsingAtAccessorAndGetValuesReturnsCorrectValue)
+{
+    auto t = Json::Tree();
+    t.pushBack(std::string("some_value"));
+    t.at(0) = 345;
+    EXPECT_EQ(345, t.at(0).get<int>());
+}
+
+TEST_F(TestTreeArrayUsage, getUsingAtAccessorOnConstTreeReturnsCorrectValue)
+{
+    auto t = Json::Tree();
+    t.pushBack(345);
+    auto const& t_const = t;
+    EXPECT_EQ(345, t_const.at(0).get<int>());
+}
+
+TEST_F(TestTreeArrayUsage, constructDocumentAndTryToGetArrayElementWithAtThrowsErrorWithHelpfulMessage)
+{
+    auto t = Json::Tree();
+    t["some_field"] = 10;
+    ASSERT_TRUE(t.isDocument());
+    EXPECT_THROW({
+        try
+        {
+            auto a = t.at(0);
+        }
+        catch(std::exception & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("array"));
+            EXPECT_THAT(err_msg, HasSubstr("document"));
+            throw;
+        }
+    }, Json::Tree::IncorrectCallForType);
+}
+
+TEST_F(TestTreeArrayUsage, createDocumentAndAccessValueWithAtAccessor)
+{
+    auto t = Json::Tree();
+    t["some_field"] = std::string("some_value");
+    EXPECT_EQ("some_value", t.at("some_field").get<std::string>());
+}
+
+TEST_F(TestTreeArrayUsage, createDocumentAndAccessManyValuesWithAtAccessor)
+{
+    auto t = Json::Tree();
+    t["a"] = std::string("some_value");
+    t["b"] = 23;
+    t["c"] = false;
+    t["d"] = 34.5f;
+
+    EXPECT_EQ("some_value", t.at("a").get<std::string>());
+    EXPECT_EQ(23, t.at("b").get<int>());
+    EXPECT_FALSE(t.at("c").get<bool>());
+    EXPECT_FLOAT_EQ(34.5f, t.at("d").get<float>());
+}
+
+TEST_F(TestTreeArrayUsage, createConstDocumentAndAccessValueWithAtAccessor)
+{
+    auto t = Json::Tree();
+    t["some_field"] = std::string("some_value");
+    auto const& t_const = t;
+    EXPECT_EQ("some_value", t_const.at("some_field").get<std::string>());
+}

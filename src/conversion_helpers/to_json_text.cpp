@@ -1,6 +1,7 @@
 #include <json/conversion_helpers/to_json_text.hpp>
 
 #include <json/conversion_helpers/token.hpp>
+#include <json/tree.hpp>
 #include <json/value.hpp>
 
 namespace CodedProject
@@ -12,7 +13,17 @@ namespace ConversionHelpers
 
 std::string toJsonText(Tree const& t)
 {
-    return {};
+    if(t.isArray())
+    {
+        auto temp = t;
+        return toJsonText(TokenType::LeftArrayBrace) +
+            toJsonText(temp[0]) +
+            toJsonText(TokenType::RightArrayBrace);
+    }
+    else
+    {
+        return toJsonText(t.getValue());
+    }
 }
 
 std::string toJsonText(Value const& v)

@@ -67,6 +67,10 @@ public:
     // ----- Array functions -------
     Tree & operator[] (size_t index);
 
+    Tree & at(size_t index);
+
+    Tree const& at(size_t index) const;
+
     void pushBack(Tree subtree);
 
     // ----- Document functions -------
@@ -78,6 +82,10 @@ public:
     // compiling as it is - leaving it not defined for now
     // JDC 20181105
     //Value const& operator[] (std::string const& field) const;
+
+    Tree & at(std::string const& field);
+
+    Tree const& at(std::string const& field) const;
 
     int count(std::string const& field_name) const;
 

@@ -103,6 +103,16 @@ Tree & Tree::operator[] (size_t index)
     return values_[index].second;
 }
 
+Tree & Tree::at(size_t index)
+{
+    return operator[](index);
+}
+
+Tree const& Tree::at(size_t index) const
+{
+    return const_cast<Tree*>(this)->operator[](index);
+}
+
 void Tree::pushBack(Tree subtree)
 {
     type_ = Type::Array;
@@ -121,6 +131,16 @@ Tree & Tree::operator[] (std::string const& field)
     }
     auto field_index = field_indexes_[field];
     return values_[field_index].second;
+}
+
+Tree & Tree::at(std::string const& field)
+{
+    return operator[](field);
+}
+
+Tree const& Tree::at(std::string const& field) const
+{
+    return const_cast<Tree*>(this)->operator[](field);
 }
 
 int Tree::count(std::string const& field_name) const

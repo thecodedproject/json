@@ -61,3 +61,15 @@ TEST_F(TestConversionHelpersToJsonTextTreeConversion, arrayWithSingleValue)
     EXPECT_EQ(expected, actual);
 }
 
+TEST_F(TestConversionHelpersToJsonTextTreeConversion, arrayWithMultipleValues)
+{
+    auto t = Builder()
+        .pushBack(234)
+        .pushBack(true)
+        .pushBack("hello")
+        .pushBack(false)
+        .getTree();
+    auto expected = "[234,true,\"hello\",false]";
+    auto actual = toJsonText(t);
+    EXPECT_EQ(expected, actual);
+}
