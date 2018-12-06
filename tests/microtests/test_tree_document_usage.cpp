@@ -223,3 +223,72 @@ TEST_F(TestTreeDocumentUsage, constructArrayAndTryToGetFieldValueThrowsErrorWith
     }, Json::Tree::IncorrectCallForType);
 }
 
+TEST_F(TestTreeDocumentUsage, createDocumentAndAccessValueWithAtAccessor)
+{
+    auto t = Json::Tree();
+    t["some_field"] = std::string("some_value");
+    EXPECT_EQ("some_value", t.at("some_field").get<std::string>());
+}
+
+TEST_F(TestTreeDocumentUsage, createDocumentAndAccessManyValuesWithAtAccessor)
+{
+    auto t = Json::Tree();
+    t["a"] = std::string("some_value");
+    t["b"] = 23;
+    t["c"] = false;
+    t["d"] = 34.5f;
+
+    EXPECT_EQ("some_value", t.at("a").get<std::string>());
+    EXPECT_EQ(23, t.at("b").get<int>());
+    EXPECT_FALSE(t.at("c").get<bool>());
+    EXPECT_FLOAT_EQ(34.5f, t.at("d").get<float>());
+}
+
+TEST_F(TestTreeDocumentUsage, createConstDocumentAndAccessValueWithAtAccessor)
+{
+    auto t = Json::Tree();
+    t["some_field"] = std::string("some_value");
+    auto const& t_const = t;
+    EXPECT_EQ("some_value", t_const.at("some_field").get<std::string>());
+}
+
+TEST_F(TestTreeDocumentUsage, accessFieldWhichDoesNotExistWithAtTHrowsOutOfRange)
+{
+    auto t = Json::Tree();
+    t["a"] = true;
+    t["b"] = 123;
+    EXPECT_THROW({
+        try
+        {
+            auto a = t.at("hello");
+        }
+        catch(std::exception & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("at(std::string)"));
+            EXPECT_THAT(err_msg, HasSubstr("'hello'"));
+            throw;
+        }
+    }, std::out_of_range);
+}
+
+TEST_F(TestTreeDocumentUsage, accessFieldOnConstTreeWhichDoesNotExistWithAtTHrowsOutOfRange)
+{
+    auto t = Json::Tree();
+    t["a"] = true;
+    t["b"] = 123;
+    auto const& t_const = t;
+    EXPECT_THROW({
+        try
+        {
+            auto a = t_const.at("hello");
+        }
+        catch(std::exception & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("at(std::string)"));
+            EXPECT_THAT(err_msg, HasSubstr("'hello'"));
+            throw;
+        }
+    }, std::out_of_range);
+}

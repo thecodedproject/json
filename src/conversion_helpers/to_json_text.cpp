@@ -15,9 +15,8 @@ std::string toJsonText(Tree const& t)
 {
     if(t.isArray())
     {
-        auto temp = t;
         return toJsonText(TokenType::LeftArrayBrace) +
-            toJsonText(temp[0]) +
+            toJsonText(t.at(0)) +
             toJsonText(TokenType::RightArrayBrace);
     }
     else

@@ -13,6 +13,7 @@ namespace Json
 
 class Tree
 {
+    typedef std::vector<std::pair<std::string, Tree>> value_storage_type;
 public:
     class IncorrectCallForType : public std::runtime_error
     {
@@ -35,9 +36,9 @@ public:
         Uninitialised
     };
 
-    typedef std::vector<std::pair<std::string, Tree>>::iterator iterator;
-    typedef std::vector<std::pair<std::string, Tree>>::const_iterator const_iterator;
-    typedef std::vector<std::pair<std::string, Tree>>::size_type size_type;
+    typedef value_storage_type::iterator iterator;
+    typedef value_storage_type::const_iterator const_iterator;
+    typedef value_storage_type::size_type size_type;
 
     Tree();
 
@@ -103,11 +104,20 @@ private:
 
     bool isNotDocument() const;
 
-    void throwIncorrectCallIfNotDocument(std::string function_signature) const;
+    void throwIncorrectCallIfNotArray(
+        std::string function_signature) const;
+
+    void throwIncorrectCallIfNotDocument(
+        std::string function_signature) const;
+
+    void throwIncorrectCallIfPredicate(
+        std::string function_signature,
+        Type function_allowed_type,
+        std::function<bool()> pred) const;
 
     Type type_ = Type::Uninitialised;
 
-    std::vector<std::pair<std::string, Tree>> values_ = {};
+    value_storage_type values_ = {};
     std::map<std::string, size_t> field_indexes_ = {};
     Value value_ = {};
 };

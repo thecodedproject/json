@@ -87,6 +87,45 @@ TEST_F(TestTreeArrayUsage, pushBackSeveralValuesIncludingSubtreesIntoArrayAndGet
     EXPECT_EQ(4, t.size());
 }
 
+TEST_F(TestTreeArrayUsage, constructFromValueAndPushBackThrowsErrorWithHelpfulMessage)
+{
+    auto t = Json::Tree(23.1f);
+    EXPECT_THROW({
+        try
+        {
+            t.pushBack(2);
+        }
+        catch(std::exception & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("array"));
+            EXPECT_THAT(err_msg, HasSubstr("pushBack(Tree)"));
+            EXPECT_THAT(err_msg, HasSubstr("value"));
+            throw;
+        }
+    }, Json::Tree::IncorrectCallForType);
+}
+
+TEST_F(TestTreeArrayUsage, constructFromDocumentAndPushBackThrowsErrorWithHelpfulMessage)
+{
+    auto t = Json::Tree();
+    t["a"] = 234;
+    EXPECT_THROW({
+        try
+        {
+            t.pushBack(2);
+        }
+        catch(std::exception & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("array"));
+            EXPECT_THAT(err_msg, HasSubstr("pushBack(Tree)"));
+            EXPECT_THAT(err_msg, HasSubstr("document"));
+            throw;
+        }
+    }, Json::Tree::IncorrectCallForType);
+}
+
 TEST_F(TestTreeArrayUsage, constructFromValueAndTryToGetArrayElementThrowsErrorWithHelpfulMessage)
 {
     auto t = Json::Tree(23.1f);
@@ -184,6 +223,7 @@ TEST_F(TestTreeArrayUsage, constructDocumentAndTryToGetArrayElementWithAtThrowsE
         catch(std::exception & e)
         {
             auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("at(size_t)"));
             EXPECT_THAT(err_msg, HasSubstr("array"));
             EXPECT_THAT(err_msg, HasSubstr("document"));
             throw;
@@ -191,31 +231,48 @@ TEST_F(TestTreeArrayUsage, constructDocumentAndTryToGetArrayElementWithAtThrowsE
     }, Json::Tree::IncorrectCallForType);
 }
 
-TEST_F(TestTreeArrayUsage, createDocumentAndAccessValueWithAtAccessor)
+
+TEST_F(TestTreeArrayUsage, accessElementWithAtWhichIsGreaterThanSizeThrowsOutOfRangeError)
 {
     auto t = Json::Tree();
-    t["some_field"] = std::string("some_value");
-    EXPECT_EQ("some_value", t.at("some_field").get<std::string>());
+    t.pushBack(345);
+    t.pushBack(345);
+    t.pushBack(345);
+    EXPECT_THROW({
+        try
+        {
+            auto a = t.at(5);
+        }
+        catch(std::exception & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("at(size_t)"));
+            EXPECT_THAT(err_msg, HasSubstr("index 5"));
+            EXPECT_THAT(err_msg, HasSubstr("size 3"));
+            throw;
+        }
+    }, std::out_of_range);
 }
 
-TEST_F(TestTreeArrayUsage, createDocumentAndAccessManyValuesWithAtAccessor)
+TEST_F(TestTreeArrayUsage, accessElementOnConstTreeWithAtWhichIsGreaterThanSizeThrowsOutOfRangeError)
 {
     auto t = Json::Tree();
-    t["a"] = std::string("some_value");
-    t["b"] = 23;
-    t["c"] = false;
-    t["d"] = 34.5f;
-
-    EXPECT_EQ("some_value", t.at("a").get<std::string>());
-    EXPECT_EQ(23, t.at("b").get<int>());
-    EXPECT_FALSE(t.at("c").get<bool>());
-    EXPECT_FLOAT_EQ(34.5f, t.at("d").get<float>());
-}
-
-TEST_F(TestTreeArrayUsage, createConstDocumentAndAccessValueWithAtAccessor)
-{
-    auto t = Json::Tree();
-    t["some_field"] = std::string("some_value");
+    t.pushBack(345);
+    t.pushBack(345);
+    t.pushBack(345);
     auto const& t_const = t;
-    EXPECT_EQ("some_value", t_const.at("some_field").get<std::string>());
+    EXPECT_THROW({
+        try
+        {
+            auto a = t_const.at(5);
+        }
+        catch(std::exception & e)
+        {
+            auto err_msg = e.what();
+            EXPECT_THAT(err_msg, HasSubstr("at(size_t)"));
+            EXPECT_THAT(err_msg, HasSubstr("index 5"));
+            EXPECT_THAT(err_msg, HasSubstr("size 3"));
+            throw;
+        }
+    }, std::out_of_range);
 }

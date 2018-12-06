@@ -93,28 +93,40 @@ void Tree::erase(iterator position)
 
 Tree & Tree::operator[] (size_t index)
 {
-    if(!isArray())
-    {
-        throw IncorrectCallForType(
-            "array function `operator[] (size_t)`",
-            typeAsString());
-    }
-
+    throwIncorrectCallIfNotArray("operator[] (size_t)");
     return values_[index].second;
 }
 
 Tree & Tree::at(size_t index)
 {
+    throwIncorrectCallIfNotArray("at(size_t)");
+
+    if(!(index<size()))
+    {
+        throw std::out_of_range(
+            "CodedProject::Json::Tree::at(size_t): "
+            "index " +
+            std::to_string(index) +
+            " out of range in array of size " +
+            std::to_string(size()));
+    }
+
     return operator[](index);
 }
 
 Tree const& Tree::at(size_t index) const
 {
-    return const_cast<Tree*>(this)->operator[](index);
+    return const_cast<Tree*>(this)->at(index);
 }
 
 void Tree::pushBack(Tree subtree)
 {
+    throwIncorrectCallIfPredicate(
+        "pushBack(Tree)",
+        Type::Array,
+        [this](){
+            return this->isDocument() || this->isValue();
+        });
     type_ = Type::Array;
     values_.push_back({"",subtree});
 }
@@ -135,12 +147,19 @@ Tree & Tree::operator[] (std::string const& field)
 
 Tree & Tree::at(std::string const& field)
 {
+    if(!count(field))
+    {
+        throw std::out_of_range(
+            "CodedProject::Json::Tree::at(std::string): "
+            "key '" + field + "' not found"
+        );
+    }
     return operator[](field);
 }
 
 Tree const& Tree::at(std::string const& field) const
 {
-    return const_cast<Tree*>(this)->operator[](field);
+    return const_cast<Tree*>(this)->at(field);
 }
 
 int Tree::count(std::string const& field_name) const
@@ -195,12 +214,36 @@ bool Tree::isNotDocument() const
     return isValue() || isArray();
 }
 
+void Tree::throwIncorrectCallIfNotArray(std::string function_signature) const
+{
+    throwIncorrectCallIfPredicate(
+        function_signature,
+        Type::Array,
+        [this](){
+            return !this->isArray();
+        });
+}
+
 void Tree::throwIncorrectCallIfNotDocument(std::string function_signature) const
 {
-    if(isNotDocument())
+    throwIncorrectCallIfPredicate(
+        function_signature,
+        Type::Document,
+        [this](){
+            return this->isNotDocument();
+        });
+}
+
+void Tree::throwIncorrectCallIfPredicate(
+    std::string function_signature,
+    Type function_allowed_type,
+    std::function<bool()> pred) const
+{
+    if(pred())
     {
         throw IncorrectCallForType(
-            "document function `" + function_signature + "`",
+            toString(function_allowed_type) +
+                "function `" + function_signature + "`",
             typeAsString());
     }
 }
