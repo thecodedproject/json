@@ -72,7 +72,8 @@ array: LEFT_ARRAY_BRACE json_expression (COMMA expression_list)* RIGHT_ARRAY_BRA
 
 ## Future improvements
 
-### Const accessors for Tree; e.g. cannot use `operator[](int)` on const Tree.
+
+### Allow adding trees with builder; i.e. pushBack(Tree), append("...", Tree), concat(Tree)...
 
 ### Better way to consturct null tree/value (connected with the potentially dodgey template, catch-all constuctor)
 

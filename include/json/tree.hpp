@@ -13,7 +13,6 @@ namespace Json
 
 class Tree
 {
-    typedef std::vector<std::pair<std::string, Tree>> value_storage_type;
 public:
     class IncorrectCallForType : public std::runtime_error
     {
@@ -36,6 +35,8 @@ public:
         Uninitialised
     };
 
+    typedef std::pair<std::string, Tree> value_type;
+    typedef std::vector<value_type> value_storage_type;
     typedef value_storage_type::iterator iterator;
     typedef value_storage_type::const_iterator const_iterator;
     typedef value_storage_type::size_type size_type;

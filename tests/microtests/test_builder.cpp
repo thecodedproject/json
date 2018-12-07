@@ -16,6 +16,30 @@ TEST_F(TestBuilder, constructEmptyTree)
     EXPECT_EQ(expected, t);
 }
 
+TEST_F(TestBuilder, openAndCloseSubtreeInArrayGivesUninitalisedTreeInArray)
+{
+    using namespace CodedProject::Json;
+    auto expected = Tree();
+    expected.pushBack(Tree(Tree::Type::Uninitialised));
+    auto t = Builder()
+        .openSubtree()
+        .closeSubtree()
+    .getTree();
+    EXPECT_EQ(expected, t);
+}
+
+TEST_F(TestBuilder, openAndCloseSubtreeInDocumentGivesUninitalisedTreeInDocument)
+{
+    using namespace CodedProject::Json;
+    auto expected = Tree();
+    expected["u"] = Tree(Tree::Type::Uninitialised);
+    auto t = Builder()
+        .openSubtree("u")
+        .closeSubtree()
+    .getTree();
+    EXPECT_EQ(expected, t);
+}
+
 TEST_F(TestBuilder, appendFieldAndStringValueGivesExpectedDocument)
 {
     auto expected = Json::Tree();
