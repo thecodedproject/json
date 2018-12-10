@@ -157,6 +157,34 @@ TEST_F(TestConversionHelpersToJsonTextTreeConversion, arrayWithMixOfValuesAndNes
     EXPECT_EQ(expected, actual);
 }
 
+TEST_F(TestConversionHelpersToJsonTextTreeConversion, arrayWithSingleSubDocument)
+{
+    auto t = Builder()
+        .openSubtree()
+            .append("a", 234)
+        .closeSubtree()
+    .getTree();
+    auto expected = "[{\"a\":234}]";
+    auto actual = toJsonText(t);
+    EXPECT_EQ(expected, actual);
+}
+
+TEST_F(TestConversionHelpersToJsonTextTreeConversion, arrayWithMultipleSubDocumentasAndValues)
+{
+    auto t = Builder()
+        .openSubtree()
+            .append("a", 234)
+        .closeSubtree()
+        .pushBack(false)
+        .openSubtree()
+            .append("b", true)
+        .closeSubtree()
+    .getTree();
+    auto expected = "[{\"a\":234},false,{\"b\":true}]";
+    auto actual = toJsonText(t);
+    EXPECT_EQ(expected, actual);
+}
+
 TEST_F(TestConversionHelpersToJsonTextTreeConversion, documentWithSingleKeyValue)
 {
     auto t = Builder()
@@ -211,5 +239,120 @@ TEST_F(TestConversionHelpersToJsonTextTreeConversion, documentWithMultipleNested
     auto expected =
         "{\"1\":{\"2\":{\"3\":{\"a\":123}}},\"4\":{\"5\":{\"b\":false}}}";
     auto actual = toJsonText(t);
+    EXPECT_EQ(expected, actual);
+}
+
+TEST_F(TestConversionHelpersToJsonTextTreeConversion, documentWithSingleSubArray)
+{
+    auto t = Builder()
+        .openSubtree("subdoc")
+            .pushBack(1)
+            .pushBack(true)
+            .pushBack("c")
+        .closeSubtree()
+    .getTree();
+    auto expected = "{\"subdoc\":[1,true,\"c\"]}";
+    auto actual = toJsonText(t);
+    EXPECT_EQ(expected, actual);
+}
+
+TEST_F(TestConversionHelpersToJsonTextTreeConversion, documentWithMultipleSubArraysAndValues)
+{
+    auto t = Builder()
+        .openSubtree("subdoc")
+            .pushBack(1)
+            .pushBack(true)
+            .pushBack("c")
+        .closeSubtree()
+        .append("a", 45)
+        .openSubtree("other")
+            .pushBack(true)
+            .pushBack(2)
+        .closeSubtree()
+        .openSubtree("other2")
+            .pushBack(false)
+            .pushBack(3)
+        .closeSubtree()
+    .getTree();
+    auto expected =
+        "{\"subdoc\":[1,true,\"c\"],\"a\":45,\"other\":[true,2],\"other2\":[false,3]}";
+    auto actual = toJsonText(t);
+    EXPECT_EQ(expected, actual);
+}
+
+TEST_F(TestConversionHelpersToJsonTextTreeConversion, documentWithheavilyNestedArraysAndDocuments)
+{
+    auto t = Builder()
+        .openSubtree("a")
+            .openSubtree()
+                .openSubtree("b")
+                    .openSubtree()
+                        .append("1", true)
+                        .append("2", "c")
+                    .closeSubtree()
+                .closeSubtree()
+            .closeSubtree()
+        .closeSubtree()
+        .append("b", 45)
+        .openSubtree("c")
+            .openSubtree("x")
+                .openSubtree("y")
+                    .openSubtree()
+                        .openSubtree("z")
+                            .pushBack(true)
+                            .pushBack(2)
+                        .closeSubtree()
+                    .closeSubtree()
+                .closeSubtree()
+            .closeSubtree()
+        .closeSubtree()
+    .getTree();
+    auto expected = "{"
+        "\"a\":[{\"b\":[{\"1\":true,\"2\":\"c\"}]}],"
+        "\"b\":45,"
+        "\"c\":{\"x\":{\"y\":[{\"z\":[true,2]}]}}"
+    "}";
+    auto actual = toJsonText(t);
+    EXPECT_EQ(expected, actual);
+}
+
+TEST_F(TestConversionHelpersToJsonTextTreeConversion, formattedDocumentWithSingleField)
+{
+    auto t = Builder()
+        .append("a", true)
+    .getTree();
+    auto expected = "{\n    \"a\": true\n}";
+    auto actual = toJsonText(t, true);
+    EXPECT_EQ(expected, actual);
+}
+TEST_F(TestConversionHelpersToJsonTextTreeConversion, formattedDocumentWithmultipleFields)
+{
+    auto t = Builder()
+        .append("a", true)
+        .append("b", false)
+        .append("c", 1)
+    .getTree();
+    auto expected = "{\n"
+        "    \"a\": true,\n"
+        "    \"b\": false,\n"
+        "    \"c\": 1\n"
+    "}";
+    auto actual = toJsonText(t, true);
+    EXPECT_EQ(expected, actual);
+}
+
+TEST_F(TestConversionHelpersToJsonTextTreeConversion, formattedArrayWithMultipleFields)
+{
+    auto t = Builder()
+        .pushBack(true)
+        .pushBack(123)
+        .pushBack("hello")
+    .getTree();
+    auto expected = "[\n"
+        "    true,\n"
+        "    123,\n"
+        "    \"hello\"\n"
+    "]";
+    auto actual = toJsonText(t, true);
     EXPECT_EQ(expected, actual);
 }

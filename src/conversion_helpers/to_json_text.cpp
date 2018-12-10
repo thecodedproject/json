@@ -13,30 +13,55 @@ namespace Json
 namespace ConversionHelpers
 {
 
+void addStringIf(
+    std::stringstream & ss,
+    std::string const s,
+    bool const add_string)
+{
+    if(add_string) ss << s;
+}
+
+void addFormatNewLine(
+    std::stringstream & ss,
+    bool const format)
+{
+    addStringIf(ss,"\n",format);
+}
+
+void addFormatSpaces(
+    std::stringstream & ss,
+    bool const format,
+    int const n_spaces)
+{
+    addStringIf(ss,std::string(n_spaces,' '),format);
+}
+
 std::string multiValueTreeToJsonText(
     Tree const& t,
     TokenType opening_token,
     TokenType closing_token,
+    bool const format,
     std::function<void(Tree::value_type const&,std::stringstream&)> add_element)
 {
     auto ss = std::stringstream{};
     ss << toJsonText(opening_token);
+    addFormatNewLine(ss, format);
     auto add_comma = false;
     for(auto const& kv : t)
     {
-        if(add_comma)
-        {
-            ss << toJsonText(TokenType::Comma);
-        }
+        addStringIf(ss,toJsonText(TokenType::Comma),add_comma);
+        addFormatNewLine(ss, format&&add_comma);
+        addFormatSpaces(ss,format,4);
         add_element(kv,ss);
         add_comma = true;
     }
+    addFormatNewLine(ss, format);
     ss << toJsonText(closing_token);
     return ss.str();
 
 }
 
-std::string toJsonText(Tree const& t)
+std::string toJsonText(Tree const& t, bool const format)
 {
     if(t.isArray())
     {
@@ -44,6 +69,7 @@ std::string toJsonText(Tree const& t)
             t,
             TokenType::LeftArrayBrace,
             TokenType::RightArrayBrace,
+            format,
             [](auto kv, auto & ss){
                 ss << toJsonText(kv.second);
             });
@@ -54,9 +80,11 @@ std::string toJsonText(Tree const& t)
             t,
             TokenType::LeftDocumentBrace,
             TokenType::RightDocumentBrace,
-            [](auto kv, auto & ss){
+            format,
+            [&format](auto kv, auto & ss){
                 ss << toJsonText(Value(kv.first));
                 ss << toJsonText(TokenType::Colon);
+                addFormatSpaces(ss,format,1);
                 ss << toJsonText(kv.second);
             });
     }
