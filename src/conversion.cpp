@@ -16,20 +16,10 @@ Tree fromString(std::string const& json_string)
     return Grammer::jsonExpression(lexer);
 }
 
-std::string toString(Tree const& tree)
+std::string toString(Tree const& tree, bool const format)
 {
     using namespace ConversionHelpers;
-    if(tree.isArray())
-    {
-        auto temp = tree;
-        return toJsonText(TokenType::LeftArrayBrace) +
-            toString(temp[0]) +
-            toJsonText(TokenType::RightArrayBrace);
-    }
-    else
-    {
-        return ConversionHelpers::toJsonText(tree.getValue());
-    }
+    return toJsonText(tree, format);
 }
 
 }
