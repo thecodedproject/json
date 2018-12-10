@@ -7,7 +7,7 @@ class TestReadJsonFromFile : public ::testing::Test
 {
 };
 
-TEST_F(TestReadJsonFromFile, some)
+TEST_F(TestReadJsonFromFile, readFromFileAndConvertBackToString)
 {
     auto f = std::ifstream("temp.json");
     auto stream = std::stringstream();
@@ -16,6 +16,7 @@ TEST_F(TestReadJsonFromFile, some)
 
     auto tree = CodedProject::Json::fromString(json_string);
 
+    auto s = CodedProject::Json::toString(tree, true);
 
 
 }
