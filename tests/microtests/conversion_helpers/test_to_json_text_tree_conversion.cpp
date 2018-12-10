@@ -325,6 +325,7 @@ TEST_F(TestConversionHelpersToJsonTextTreeConversion, formattedDocumentWithSingl
     auto actual = toJsonText(t, true);
     EXPECT_EQ(expected, actual);
 }
+
 TEST_F(TestConversionHelpersToJsonTextTreeConversion, formattedDocumentWithmultipleFields)
 {
     auto t = Builder()
@@ -356,3 +357,135 @@ TEST_F(TestConversionHelpersToJsonTextTreeConversion, formattedArrayWithMultiple
     auto actual = toJsonText(t, true);
     EXPECT_EQ(expected, actual);
 }
+
+TEST_F(TestConversionHelpersToJsonTextTreeConversion, formattedDocumentWithNestedDocument)
+{
+    auto t = Builder()
+        .append("a", true)
+        .openSubtree("b")
+            .append("1", 1)
+            .append("2", false)
+        .closeSubtree()
+    .getTree();
+    auto expected =
+        "{\n"
+        "    \"a\": true,\n"
+        "    \"b\": {\n"
+        "        \"1\": 1,\n"
+        "        \"2\": false\n"
+        "    }\n"
+        "}";
+    auto actual = toJsonText(t, true);
+    EXPECT_EQ(expected, actual);
+}
+
+TEST_F(TestConversionHelpersToJsonTextTreeConversion, formattedDocumentWithNestedArray)
+{
+    auto t = Builder()
+        .append("a", true)
+        .openSubtree("b")
+            .pushBack(1)
+            .pushBack(false)
+        .closeSubtree()
+    .getTree();
+    auto expected =
+        "{\n"
+        "    \"a\": true,\n"
+        "    \"b\": [\n"
+        "        1,\n"
+        "        false\n"
+        "    ]\n"
+        "}";
+    auto actual = toJsonText(t, true);
+    EXPECT_EQ(expected, actual);
+}
+
+TEST_F(TestConversionHelpersToJsonTextTreeConversion, formattedDocumentWithMultipleNestedArraysAndDocuments)
+{
+    auto t = Builder()
+        .append("a", true)
+        .openSubtree("b")
+            .pushBack(1)
+            .openSubtree()
+                .openSubtree("1")
+                    .pushBack(5)
+                .closeSubtree()
+                .openSubtree("2")
+                    .append("a", true)
+                .closeSubtree()
+            .closeSubtree()
+        .closeSubtree()
+        .openSubtree("c")
+            .openSubtree("1")
+                .pushBack(true)
+                .pushBack(6)
+            .closeSubtree()
+        .closeSubtree()
+    .getTree();
+    auto expected =
+        "{\n"
+        "    \"a\": true,\n"
+        "    \"b\": [\n"
+        "        1,\n"
+        "        {\n"
+        "            \"1\": [\n"
+        "                5\n"
+        "            ],\n"
+        "            \"2\": {\n"
+        "                \"a\": true\n"
+        "            }\n"
+        "        }\n"
+        "    ],\n"
+        "    \"c\": {\n"
+        "        \"1\": [\n"
+        "            true,\n"
+        "            6\n"
+        "        ]\n"
+        "    }\n"
+        "}";
+    auto actual = toJsonText(t, true);
+    EXPECT_EQ(expected, actual);
+}
+
+TEST_F(TestConversionHelpersToJsonTextTreeConversion, formattedArrayWithNestedArray)
+{
+    auto t = Builder()
+        .pushBack(123)
+        .openSubtree()
+            .pushBack(true)
+            .pushBack(345)
+        .closeSubtree()
+    .getTree();
+    auto expected =
+        "[\n"
+        "    123,\n"
+        "    [\n"
+        "        true,\n"
+        "        345\n"
+        "    ]\n"
+        "]";
+    auto actual = toJsonText(t, true);
+    EXPECT_EQ(expected, actual);
+}
+
+TEST_F(TestConversionHelpersToJsonTextTreeConversion, formattedArrayWithNestedDocument)
+{
+    auto t = Builder()
+        .pushBack(123)
+        .openSubtree()
+            .append("a", true)
+            .append("b", 345)
+        .closeSubtree()
+    .getTree();
+    auto expected =
+        "[\n"
+        "    123,\n"
+        "    {\n"
+        "        \"a\": true,\n"
+        "        \"b\": 345\n"
+        "    }\n"
+        "]";
+    auto actual = toJsonText(t, true);
+    EXPECT_EQ(expected, actual);
+}
+

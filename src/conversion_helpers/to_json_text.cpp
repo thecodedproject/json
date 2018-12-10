@@ -36,32 +36,43 @@ void addFormatSpaces(
     addStringIf(ss,std::string(n_spaces,' '),format);
 }
 
+void addFormatNewLineAndIndent(
+    std::stringstream & ss,
+    bool const format,
+    int indent_width)
+{
+    addFormatNewLine(ss, format);
+    addFormatSpaces(ss,format,indent_width);
+}
+
+
 std::string multiValueTreeToJsonText(
     Tree const& t,
     TokenType opening_token,
     TokenType closing_token,
     bool const format,
-    std::function<void(Tree::value_type const&,std::stringstream&)> add_element)
+    int const current_indent,
+    std::function<void(Tree::value_type const&,std::stringstream&,bool,int)> add_element)
 {
+    auto indent_width=4;
     auto ss = std::stringstream{};
     ss << toJsonText(opening_token);
-    addFormatNewLine(ss, format);
     auto add_comma = false;
+    auto const subtree_indent = current_indent+indent_width;
     for(auto const& kv : t)
     {
         addStringIf(ss,toJsonText(TokenType::Comma),add_comma);
-        addFormatNewLine(ss, format&&add_comma);
-        addFormatSpaces(ss,format,4);
-        add_element(kv,ss);
+        addFormatNewLineAndIndent(ss, format,subtree_indent);
+        add_element(kv,ss,format,subtree_indent);
         add_comma = true;
     }
-    addFormatNewLine(ss, format);
+    addFormatNewLineAndIndent(ss, format,current_indent);
     ss << toJsonText(closing_token);
     return ss.str();
 
 }
 
-std::string toJsonText(Tree const& t, bool const format)
+std::string toJsonText(Tree const& t, bool const format, int const indent)
 {
     if(t.isArray())
     {
@@ -70,8 +81,9 @@ std::string toJsonText(Tree const& t, bool const format)
             TokenType::LeftArrayBrace,
             TokenType::RightArrayBrace,
             format,
-            [](auto kv, auto & ss){
-                ss << toJsonText(kv.second);
+            indent,
+            [](auto kv, auto & ss, auto const format, auto const indent){
+                ss << toJsonText(kv.second, format, indent);
             });
     }
     else if(t.isDocument())
@@ -81,11 +93,12 @@ std::string toJsonText(Tree const& t, bool const format)
             TokenType::LeftDocumentBrace,
             TokenType::RightDocumentBrace,
             format,
-            [&format](auto kv, auto & ss){
+            indent,
+            [](auto kv, auto & ss, auto const format, auto const indent){
                 ss << toJsonText(Value(kv.first));
                 ss << toJsonText(TokenType::Colon);
                 addFormatSpaces(ss,format,1);
-                ss << toJsonText(kv.second);
+                ss << toJsonText(kv.second, format, indent);
             });
     }
     else if(t.isValue())

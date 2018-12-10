@@ -11,7 +11,7 @@ namespace Json
 namespace ConversionHelpers
 {
 
-std::string toJsonText(Tree const& t, bool format=false);
+std::string toJsonText(Tree const& t, bool format=false, int indent=0);
 
 std::string toJsonText(Value const& v);
 
