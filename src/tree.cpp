@@ -60,6 +60,34 @@ bool Tree::operator!= (Tree const& rhs) const
     return !operator==(rhs);
 }
 
+bool Tree::compareOrderIndependent(Tree const& rhs) const
+{
+    if(!isDocument() || !rhs.isDocument())
+    {
+        return operator==(rhs);
+    }
+
+    for(auto const& field_index : field_indexes_)
+    {
+        auto field = field_index.first;
+        auto i = field_index.second;
+
+        if(!rhs.count(field))
+        {
+            return false;
+        }
+
+        auto rhs_i = rhs.field_indexes_.at(field);
+        if(!values_[i].second.compareOrderIndependent(
+            rhs.values_[rhs_i].second))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool Tree::isArray() const
 {
     return type_==Type::Array;

@@ -51,13 +51,13 @@ Builder?
 };
 ```
 
-## Improvements over Boost ptree (for the desired purpose of representing JSON):
+## Improvements over Boost ptree (for the desired purpose of representing JSON, which is not what Boost ptree is meant for!):
 
 * Preserves type information of the stored values.
 
 * Gives explicit methods to tell if any given node in the tree is an array, document or value.
 
-* Does not allow duplicate fields to be inserted into a document (although I think that this may be valid JSON)
+* Does not allow duplicate fields to be inserted into a document
 
 ## Grammers:
 
@@ -84,6 +84,15 @@ However some, namely `toString(Value)` converts to a printable string showing th
 Potentially rethink this design?
 
 ### Order independent comparison (of documents) and sort functions (for documents only)
+
+This has been put into a new function called `compareOrderIndependent` (rather than muddying up the `operator==`).
+However I'm not sure if that function name captures that the order independent-ness is only for documents and not arrays.
+
+The reasoning for putting this in its own function rather than making it part of `operator==` is as follows;
+
+A document currently stores the ordering of the fields inserted into it - when iterating through a document you visit fields in the order they were inserted; therefore it seems wierd to have the `operator==` return true for two documents which have different observable behaviours (i.e. same fields + values but in different order).
+To resolve this there are two options; either remove the ordering of documents completely, or have `operator==` consider document order and create a new function for order indepenent comparison of documents.
+The second option was favoured as to not remove the ordering functionality of documents which may be useful in some situations.
 
 ### Handle escpaed double quotes within strings
 

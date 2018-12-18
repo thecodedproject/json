@@ -27,6 +27,8 @@
 
 #include <json/tree.hpp>
 
+#include <json/builder.hpp>
+
 using namespace CodedProject;
 using namespace ::testing;
 
@@ -71,6 +73,13 @@ TEST_F(TestTreeComparison, emptyValuetTreesCompareEqual)
 {
     auto t = Json::Tree(Json::Tree::Type::Value);
     auto u = Json::Tree(Json::Tree::Type::Value);
+    expectComparesEqual(t, u);
+}
+
+TEST_F(TestTreeComparison, uninitialisedtTreesCompareEqual)
+{
+    auto t = Json::Tree(Json::Tree::Type::Uninitialised);
+    auto u = Json::Tree(Json::Tree::Type::Uninitialised);
     expectComparesEqual(t, u);
 }
 
@@ -336,4 +345,297 @@ TEST_F(TestTreeComparison, arraysWithSameMultipleElementsAndSubTreesCompareEqual
     u.pushBack(u_subtree);
     u.pushBack(233);
     expectComparesEqual(t, u);
+}
+
+TEST_F(TestTreeComparison,
+    compareOrderIndependentWithDocumentsWithSameFieldsAndValuesButInDifferentOrderReturnsTrue)
+{
+    auto t = Json::Tree();
+    t["a"] = std::string("hello");
+    t["b"] = false;
+    t["c"] = 100;
+    auto u = Json::Tree();
+    u["c"] = 100;
+    u["b"] = false;
+    u["a"] = std::string("hello");
+    EXPECT_TRUE(t.compareOrderIndependent(u));
+}
+
+TEST_F(TestTreeComparison,
+    compareOrderIndependentWithDocumentsWithSameFieldsAndValuesInSameOrderReturnsTrue)
+{
+    auto t = Json::Tree();
+    t["a"] = std::string("hello");
+    t["b"] = false;
+    t["c"] = 100;
+    auto u = Json::Tree();
+    u["a"] = std::string("hello");
+    u["b"] = false;
+    u["c"] = 100;
+    EXPECT_TRUE(t.compareOrderIndependent(u));
+}
+
+TEST_F(TestTreeComparison,
+    compareOrderIndependentWithDocsOfDifferentSizesReturnsFalse)
+{
+    auto t = Json::Tree();
+    t["a"] = std::string("hello");
+    t["b"] = false;
+    t["c"] = 100;
+    auto u = Json::Tree();
+    u["b"] = false;
+    u["c"] = 100;
+    EXPECT_FALSE(t.compareOrderIndependent(u));
+}
+
+TEST_F(TestTreeComparison,
+    compareOrderIndependentWithDocsWithSameFieldsButDifferentValuesReturnsFalse)
+{
+    auto t = Json::Tree();
+    t["a"] = std::string("hello");
+    t["b"] = false;
+    t["c"] = 100;
+    auto u = Json::Tree();
+    u["a"] = false;
+    u["b"] = 23.5f;
+    u["c"] = 2;
+    EXPECT_FALSE(t.compareOrderIndependent(u));
+}
+
+TEST_F(TestTreeComparison,
+    compareOrderIndependentWithDocsWithSameNumberOfFieldsButDifferentFieldNamesReturnsFalse)
+{
+    auto t = Json::Tree();
+    t["a"] = std::string("hello");
+    t["b"] = false;
+    t["c"] = 100;
+    auto u = Json::Tree();
+    u["a"] = std::string("hello");
+    u["d"] = false;
+    u["c"] = 100;
+    EXPECT_FALSE(t.compareOrderIndependent(u));
+}
+
+TEST_F(TestTreeComparison,
+    compareOrderIndependentWithArraysWhichHaveSameValuesInSameOrderReturnsTrue)
+{
+    auto t = Json::Tree();
+    t.pushBack(std::string("hello"));
+    t.pushBack(false);
+    t.pushBack(100);
+    auto u = Json::Tree();
+    u.pushBack(std::string("hello"));
+    u.pushBack(false);
+    u.pushBack(100);
+    EXPECT_TRUE(t.compareOrderIndependent(u));
+}
+
+TEST_F(TestTreeComparison,
+    compareOrderIndependentWithArraysWhichAreDifferentSizesReturnsFalse)
+{
+    auto t = Json::Tree();
+    t.pushBack(std::string("hello"));
+    t.pushBack(false);
+    auto u = Json::Tree();
+    u.pushBack(std::string("hello"));
+    u.pushBack(false);
+    u.pushBack(100);
+    EXPECT_FALSE(t.compareOrderIndependent(u));
+}
+
+TEST_F(TestTreeComparison,
+    compareOrderIndependentWithArraysWhichHaveSameValuesInDifferentOrderReturnsFalse)
+{
+    auto t = Json::Tree();
+    t.pushBack(std::string("hello"));
+    t.pushBack(false);
+    t.pushBack(100);
+    auto u = Json::Tree();
+    u.pushBack(false);
+    u.pushBack(100);
+    u.pushBack(std::string("hello"));
+    EXPECT_FALSE(t.compareOrderIndependent(u));
+}
+
+TEST_F(TestTreeComparison,
+    compareOrderIndependentWithValuesWhichAreTheSameReturnsTrue)
+{
+    auto t = Json::Tree(123);
+    auto u = Json::Tree(123);
+    EXPECT_TRUE(t.compareOrderIndependent(u));
+}
+
+TEST_F(TestTreeComparison,
+    compareOrderIndependentWithValuesWhichAreDifferentReturnsFalse)
+{
+    auto t = Json::Tree(123);
+    auto u = Json::Tree(false);
+    EXPECT_FALSE(t.compareOrderIndependent(u));
+}
+
+TEST_F(TestTreeComparison,
+    compareOrderIndependentWithUninitalisedTreesReturnsTrue)
+{
+    auto t = Json::Tree();
+    auto u = Json::Tree();
+    EXPECT_TRUE(t.compareOrderIndependent(u));
+}
+
+TEST_F(TestTreeComparison,
+    compareOrderIndependentWithUninitalisedTreeAndDocReturnsFalse)
+{
+    auto t = Json::Tree();
+    auto u = Json::Tree();
+    u["a"] = 10;
+    EXPECT_FALSE(t.compareOrderIndependent(u));
+}
+
+TEST_F(TestTreeComparison,
+    compareOrderIndependentWithArrayWithDocumentReturnsFalse)
+{
+    auto t = Json::Tree();
+    t.pushBack(123);
+    auto u = Json::Tree();
+    u["a"] = 123;
+    EXPECT_FALSE(t.compareOrderIndependent(u));
+}
+
+TEST_F(TestTreeComparison,
+    compareOrderIndependentWithDocumentWithArrayReturnsFalse)
+{
+    auto t = Json::Tree();
+    t.pushBack(123);
+    auto u = Json::Tree();
+    u["a"] = 123;
+    EXPECT_FALSE(u.compareOrderIndependent(t));
+}
+
+TEST_F(TestTreeComparison,
+    compareOrderIndependentWithDocsWithSameSubArraysOnSameFieldsInDifferentOrderReturnsTrue)
+{
+    auto t = Json::Builder()
+        .openSubtree("a")
+            .pushBack(1)
+            .pushBack(true)
+        .closeSubtree()
+        .openSubtree("b")
+            .pushBack(2)
+            .pushBack(false)
+        .closeSubtree()
+    .getTree();
+    auto u = Json::Builder()
+        .openSubtree("b")
+            .pushBack(2)
+            .pushBack(false)
+        .closeSubtree()
+        .openSubtree("a")
+            .pushBack(1)
+            .pushBack(true)
+        .closeSubtree()
+    .getTree();
+    EXPECT_TRUE(t.compareOrderIndependent(u));
+}
+
+TEST_F(TestTreeComparison,
+    compareOrderIndependentWithDocsWithDifferentSubArraysReturnsFalse)
+{
+    auto t = Json::Builder()
+        .openSubtree("a")
+            .pushBack(1)
+            .pushBack(false)
+        .closeSubtree()
+        .openSubtree("b")
+            .pushBack(2)
+            .pushBack(false)
+        .closeSubtree()
+    .getTree();
+    auto u = Json::Builder()
+        .openSubtree("a")
+            .pushBack(1)
+            .pushBack(true)
+        .closeSubtree()
+        .openSubtree("b")
+            .pushBack(2)
+            .pushBack(false)
+        .closeSubtree()
+    .getTree();
+    EXPECT_FALSE(t.compareOrderIndependent(u));
+}
+
+TEST_F(TestTreeComparison,
+    compareOrderIndependentWithDocsWithSameSubDocsOnSameFieldsInDifferentOrderReturnsTrue)
+{
+    auto t = Json::Builder()
+        .openSubtree("a")
+            .append("1", 1)
+            .append("2", true)
+        .closeSubtree()
+        .openSubtree("b")
+            .append("1", 2)
+            .append("2", false)
+        .closeSubtree()
+    .getTree();
+    auto u = Json::Builder()
+        .openSubtree("b")
+            .append("2", false)
+            .append("1", 2)
+        .closeSubtree()
+        .openSubtree("a")
+            .append("2", true)
+            .append("1", 1)
+        .closeSubtree()
+    .getTree();
+    EXPECT_TRUE(t.compareOrderIndependent(u));
+}
+
+TEST_F(TestTreeComparison,
+    compareOrderIndependentWithDocsWithSubdocsWithDifferentValuesReturnsFalse)
+{
+    auto t = Json::Builder()
+        .openSubtree("a")
+            .append("1", 1)
+            .append("2", true)
+        .closeSubtree()
+        .openSubtree("b")
+            .append("1", 2)
+            .append("2", true)
+        .closeSubtree()
+    .getTree();
+    auto u = Json::Builder()
+        .openSubtree("b")
+            .append("2", false)
+            .append("1", 2)
+        .closeSubtree()
+        .openSubtree("a")
+            .append("2", true)
+            .append("1", 1)
+        .closeSubtree()
+    .getTree();
+    EXPECT_FALSE(t.compareOrderIndependent(u));
+}
+
+TEST_F(TestTreeComparison,
+    compareOrderIndependentWithDocsWithSubdocsWithDifferentFieldsReturnsFalse)
+{
+    auto t = Json::Builder()
+        .openSubtree("a")
+            .append("1", 1)
+            .append("2", true)
+        .closeSubtree()
+        .openSubtree("b")
+            .append("some_field", 2)
+            .append("2", false)
+        .closeSubtree()
+    .getTree();
+    auto u = Json::Builder()
+        .openSubtree("b")
+            .append("2", false)
+            .append("1", 2)
+        .closeSubtree()
+        .openSubtree("a")
+            .append("2", true)
+            .append("1", 1)
+        .closeSubtree()
+    .getTree();
+    EXPECT_FALSE(t.compareOrderIndependent(u));
 }

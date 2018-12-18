@@ -76,6 +76,8 @@ public:
     bool operator== (Tree const& rhs) const;
     bool operator!= (Tree const& rhs) const;
 
+    bool compareOrderIndependent(Tree const& rhs) const;
+
     bool isArray() const;
     bool isDocument() const;
     bool isValue() const;
@@ -142,7 +144,6 @@ private:
         std::function<bool()> pred) const;
 
     Type type_ = Type::Uninitialised;
-
     value_storage_type values_ = {};
     std::map<std::string, size_t> field_indexes_ = {};
     Value value_ = {};
