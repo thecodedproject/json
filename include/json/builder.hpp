@@ -44,9 +44,9 @@ public:
         std::string const& field,
         T const& value);
 
-    template <typename T>
+    template <typename... Args>
     Builder& pushBack(
-        T const& value);
+        Args&&... values);
 
     Builder& openSubtree();
     Builder& openSubtree(std::string const& field);
@@ -88,10 +88,10 @@ Builder& Builder::append(
     return *this;
 }
 
-template <typename T>
-Builder& Builder::pushBack(T const& value)
+template <typename... Args>
+Builder& Builder::pushBack(Args&&... values)
 {
-    tree_.pushBack(value);
+    (tree_.pushBack(values), ...);
     return *this;
 }
 

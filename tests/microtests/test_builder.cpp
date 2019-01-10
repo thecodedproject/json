@@ -171,6 +171,18 @@ TEST_F(TestBuilder, pushBackSingleBoolValueGivesExpectedArray)
     EXPECT_EQ(expected, t);
 }
 
+TEST_F(TestBuilder, pushBackMutlipleFieldsOfDifferentTypesGivesExpectedArray)
+{
+    auto expected = Json::Tree();
+    expected.pushBack(std::string("hello"));
+    expected.pushBack(234);
+    expected.pushBack(false);
+    auto t = Builder()
+        .pushBack(std::string("hello"), 234, false)
+    .getTree();
+    EXPECT_EQ(expected, t);
+}
+
 TEST_F(TestBuilder, pushBackSubarrayGivesExpectedArray)
 {
     auto subarray = Json::Tree();
