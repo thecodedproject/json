@@ -27,11 +27,14 @@
 
 #include <string>
 #include <stdexcept>
+#include <type_traits>
 
 namespace CodedProject
 {
 namespace Json
 {
+
+template<class T> struct DependentFalse : std::false_type {};
 
 class Value;
 
@@ -82,6 +85,37 @@ private:
     float float_value_ = {};
     bool bool_value_ = {};
 };
+
+template <typename T>
+Value::Value(T value)
+{
+    if constexpr (
+        std::is_same<T, std::string>::value ||
+        std::is_same<T, const char *>::value)
+    {
+        type_ = Type::String;
+        string_value_ = value;
+    }
+    else if constexpr (std::is_same<T, int>::value)
+    {
+        type_ = Type::Integer;
+        integer_value_ = value;
+    }
+    else if constexpr (std::is_same<T, float>::value)
+    {
+        type_ = Type::Float;
+        float_value_ = value;
+    }
+    else if constexpr (std::is_same<T, bool>::value)
+    {
+        type_ = Type::Bool;
+        bool_value_ = value;
+    }
+    else
+    {
+        static_assert(DependentFalse<T>::value, "Unsupported type");
+    }
+}
 
 std::string toString(Value::Type type);
 

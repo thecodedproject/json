@@ -56,41 +56,6 @@ std::string toString(Value::Type type)
 
 Value::Value() = default;
 
-template <>
-Value::Value(std::string s)
-: type_(Type::String),
-  string_value_(s)
-{
-}
-
-template <>
-Value::Value(char const * s)
-: type_(Type::String),
-  string_value_(s)
-{
-}
-
-template <>
-Value::Value(int i)
-: type_(Type::Integer),
-  integer_value_(i)
-{
-}
-
-template <>
-Value::Value(float f)
-: type_(Type::Float),
-  float_value_(f)
-{
-}
-
-template <>
-Value::Value(bool b)
-: type_(Type::Bool),
-  bool_value_(b)
-{
-}
-
 bool Value::operator== (Value const& rhs) const
 {
     return string_value_ == rhs.string_value_ &&
