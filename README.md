@@ -70,6 +70,29 @@ array: LEFT_ARRAY_BRACE json_expression (COMMA expression_list)* RIGHT_ARRAY_BRA
 ```
 
 
+## Design decision around support for narrowing types
+
+The value class may be setup to support all basic types, however JSON will preserver none of this type information.
+It is unclear what should happen in the coversion to/from JSON and whether the narrower types should be allowed.
+E.g. Integers should _probably_ be stored as `int64_t` (or maybe even `long long`?) (when converted from JSON into `Value`s) in order to avoid narrowing, however does that mean that int32 shouldnt be supported by `Value`? Doing so might make the interface nasty  if `int64_t` has to be used both to set and get values from `Value` and `Tree`.
+The same can be said for floating point numbers as well; _probably should_ use `double` not `float`.
+(It's unclear what should happen for strings... should they be `std::string` of `char const *`? This is seperate from the narrowing question.)
+
+The best solution seems to be to allow all types with `Value`, then accept the loss of type info when converting to JSON - when converting back from JSON have integeres, real numbers, amd strings convert to some predefined types (e.g. `int_64_t`, `double` and `std::string`) always.
+
+
+*New thoughts 20190124:*
+A potential better solution is to have predefined types for json strings, integers, floating points and bools and only allow `Value` to store one of those particular types.
+I.e. the whole JSON lib. will only work with those types and store everyhting in the widest possible representation (which also has the nice property that converting to JSON and back will give JSON trees which compare equal - which semantically they should).
+One thing that should happen in this case, however, is to get `Value` to do the conversion from all relevant types to the appropriate long types.
+This should be relatively stright forward:
+
+* For strings this is only `std::string` and `char const *` (and maybe `std::string_view`?)
+* For integers `std::is_integral` can be used
+* For floating points `std::is_float` can be used
+* For bools this should be trivial as (I think!) this should only be `bool`)
+
+
 ## Future improvements
 
 
