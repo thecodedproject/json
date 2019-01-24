@@ -141,16 +141,16 @@ std::string toJsonText(Value const& v)
     switch(v.type())
     {
         case Value::Type::String:
-            return "\"" + v.get<std::string>() + "\"";
+            return "\"" + v.get<Json::String>() + "\"";
         case Value::Type::Integer:
-            return std::to_string(v.get<int>());
+            return std::to_string(v.get<Json::Integer>());
         case Value::Type::Bool:
-            if(v.get<bool>())
+            if(v.get<Json::Bool>())
                 return "true";
             else
                 return "false";
         case Value::Type::FloatingPoint:
-            return std::to_string(v.get<float>());
+            return std::to_string(v.get<Json::FloatingPoint>());
         case Value::Type::Null:
             return "null";
     }

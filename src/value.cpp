@@ -75,7 +75,7 @@ Value::Type Value::type() const
 }
 
 template <>
-std::string Value::get() const
+String Value::get() const
 {
     if(type_ == Type::String)
     {
@@ -88,7 +88,7 @@ std::string Value::get() const
 }
 
 template <>
-int Value::get() const
+Integer Value::get() const
 {
     if(type_ == Type::Integer)
     {
@@ -101,7 +101,7 @@ int Value::get() const
 }
 
 template <>
-float Value::get() const
+FloatingPoint Value::get() const
 {
     if(type_ == Type::FloatingPoint)
     {
@@ -114,7 +114,7 @@ float Value::get() const
 }
 
 template <>
-bool Value::get() const
+Bool Value::get() const
 {
     if(type_ == Type::Bool)
     {

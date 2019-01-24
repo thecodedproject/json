@@ -63,10 +63,10 @@ TEST_F(TestTreeErase,
     ASSERT_EQ(2, t.size());
     auto it = std::begin(t);
     EXPECT_EQ("first", it->first);
-    EXPECT_EQ(10, it->second.get<int>());
+    EXPECT_EQ(10, it->second.get<Json::Integer>());
     ++it;
     EXPECT_EQ("third", it->first);
-    EXPECT_EQ("hello", it->second.get<std::string>());
+    EXPECT_EQ("hello", it->second.get<Json::String>());
     ++it;
     EXPECT_TRUE(it == std::end(t));
 }
@@ -85,8 +85,8 @@ TEST_F(TestTreeErase,
     t.erase("second");
 
     ASSERT_EQ(2, t.size());
-    EXPECT_EQ(10, t["first"].get<int>());
-    EXPECT_EQ("hello", t["third"].get<std::string>());
+    EXPECT_EQ(10, t["first"].get<Json::Integer>());
+    EXPECT_EQ("hello", t["third"].get<Json::String>());
 }
 
 TEST_F(TestTreeErase, eraseFieldThatDoesNotExistFromDocumentReturnsZero)
@@ -126,9 +126,9 @@ TEST_F(TestTreeErase,
 
     t.erase("some_field");
 
-    EXPECT_EQ(10, t["first"].get<int>());
-    EXPECT_FALSE(t["second"].get<bool>());
-    EXPECT_EQ("hello", t["third"].get<std::string>());
+    EXPECT_EQ(10, t["first"].get<Json::Integer>());
+    EXPECT_FALSE(t["second"].get<Json::Bool>());
+    EXPECT_EQ("hello", t["third"].get<Json::String>());
 }
 
 TEST_F(TestTreeErase,
@@ -145,12 +145,12 @@ TEST_F(TestTreeErase,
     t.erase("second");
     t["second"] = 23.5f;
 
-    EXPECT_EQ(10, t["first"].get<int>());
+    EXPECT_EQ(10, t["first"].get<Json::Integer>());
 
     std::cout << static_cast<int>(t["third"].getValue().type()) << std::endl;
 
-    EXPECT_EQ("hello", t["third"].get<std::string>());
-    EXPECT_FLOAT_EQ(23.5f, t["second"].get<float>());
+    EXPECT_EQ("hello", t["third"].get<Json::String>());
+    EXPECT_FLOAT_EQ(23.5f, t["second"].get<Json::FloatingPoint>());
 }
 
 TEST_F(TestTreeErase, tryToEraseFieldFromValueTreeThrowsErrorWithHelpfulMessage)
@@ -226,10 +226,10 @@ TEST_F(TestTreeErase, eraseElementFromDocumentTreeWithIteratorAndIterateOverRema
     ASSERT_EQ(2, t.size());
     auto it = std::begin(t);
     EXPECT_EQ("b", it->first);
-    EXPECT_FLOAT_EQ(12.3f, it->second.get<float>());
+    EXPECT_FLOAT_EQ(12.3f, it->second.get<Json::FloatingPoint>());
     ++it;
     EXPECT_EQ("c", it->first);
-    EXPECT_TRUE(it->second.get<bool>());
+    EXPECT_TRUE(it->second.get<Json::Bool>());
     ++it;
     EXPECT_TRUE(it == std::end(t));
 }
@@ -247,6 +247,6 @@ TEST_F(TestTreeErase,
     auto element_to_erase = std::begin(t);
     t.erase(element_to_erase);
 
-    EXPECT_FLOAT_EQ(12.3f, t["b"].get<float>());
-    EXPECT_TRUE(t["c"].get<bool>());
+    EXPECT_FLOAT_EQ(12.3f, t["b"].get<Json::FloatingPoint>());
+    EXPECT_TRUE(t["c"].get<Json::Bool>());
 }

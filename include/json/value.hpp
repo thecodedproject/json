@@ -29,6 +29,8 @@
 #include <stdexcept>
 #include <type_traits>
 
+#include <json/type_defs.hpp>
+
 namespace CodedProject
 {
 namespace Json
@@ -80,10 +82,10 @@ private:
     std::string objectAsPrintableString() const;
 
     Type type_ = Type::Null;
-    std::string string_value_ = {};
-    int integer_value_ = {};
-    float float_value_ = {};
-    bool bool_value_ = {};
+    Json::String string_value_ = {};
+    Json::Integer integer_value_ = {};
+    Json::FloatingPoint float_value_ = {};
+    Json::Bool bool_value_ = {};
 };
 
 template <typename T>
@@ -96,20 +98,20 @@ Value::Value(T value)
         type_ = Type::String;
         string_value_ = value;
     }
-    else if constexpr (std::is_same<T, int>::value)
-    {
-        type_ = Type::Integer;
-        integer_value_ = value;
-    }
-    else if constexpr (std::is_same<T, float>::value)
-    {
-        type_ = Type::FloatingPoint;
-        float_value_ = value;
-    }
     else if constexpr (std::is_same<T, bool>::value)
     {
         type_ = Type::Bool;
         bool_value_ = value;
+    }
+    else if constexpr (std::is_integral<T>::value)
+    {
+        type_ = Type::Integer;
+        integer_value_ = value;
+    }
+    else if constexpr (std::is_floating_point<T>::value)
+    {
+        type_ = Type::FloatingPoint;
+        float_value_ = value;
     }
     else
     {

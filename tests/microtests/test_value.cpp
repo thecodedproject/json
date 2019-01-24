@@ -52,9 +52,28 @@ TEST_F(TestValue, constructFromIntAndGetType)
     EXPECT_EQ(Json::Value::Type::Integer, v.type());
 }
 
+TEST_F(TestValue, constructFromLongLongAndGetValueGivesInteger)
+{
+    Json::Value v{50ll};
+    EXPECT_EQ(Json::Value::Type::Integer, v.type());
+}
+
+TEST_F(TestValue, constructFromShortIntAndGetValueGivesInteger)
+{
+    int8_t short_int{10};
+    Json::Value v{short_int};
+    EXPECT_EQ(Json::Value::Type::Integer, v.type());
+}
+
 TEST_F(TestValue, constructFromFloatAndGetType)
 {
     auto v = Json::Value(2.0f);
+    EXPECT_EQ(Json::Value::Type::FloatingPoint, v.type());
+}
+
+TEST_F(TestValue, constructFromDoubleAndGetType)
+{
+    Json::Value v{2.0};
     EXPECT_EQ(Json::Value::Type::FloatingPoint, v.type());
 }
 
@@ -68,14 +87,14 @@ TEST_F(TestValue, constructFromStringAndGetValueAsString)
 {
     auto value = std::string("some_value");
     auto v = Json::Value(value);
-    EXPECT_EQ(value, v.get<std::string>());
+    EXPECT_EQ(value, v.get<Json::String>());
 }
 
 TEST_F(TestValue, constructFromCharArrayAndGetValueAsString)
 {
     auto value = "some_value_2";
     auto v = Json::Value(value);
-    EXPECT_EQ(value, v.get<std::string>());
+    EXPECT_EQ(value, v.get<Json::String>());
 }
 
 TEST_F(TestValue, defaultConstructAndGetValueAsStringThrowsWithHelpfulMessage)
@@ -84,7 +103,7 @@ TEST_F(TestValue, defaultConstructAndGetValueAsStringThrowsWithHelpfulMessage)
     EXPECT_THROW({
         try
         {
-            v.get<std::string>();
+            v.get<Json::String>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
@@ -102,7 +121,7 @@ TEST_F(TestValue, constructFromIntAndGetValueAsStringThrowsWithHelpfulMessage)
     EXPECT_THROW({
         try
         {
-            v.get<std::string>();
+            v.get<Json::String>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
@@ -121,7 +140,7 @@ TEST_F(TestValue, constructFromTrueBoolAndGetValueAsStringThrowsWithHelpfulMessa
     EXPECT_THROW({
         try
         {
-            v.get<std::string>();
+            v.get<Json::String>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
@@ -140,7 +159,7 @@ TEST_F(TestValue, constructFromFalseBoolAndGetValueAsStringThrowsWithHelpfulMess
     EXPECT_THROW({
         try
         {
-            v.get<std::string>();
+            v.get<Json::String>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
@@ -159,7 +178,7 @@ TEST_F(TestValue, constructFromFloatAndGetValueAsStringThrowsWithHelpfulMessage)
     EXPECT_THROW({
         try
         {
-            v.get<std::string>();
+            v.get<Json::String>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
@@ -176,14 +195,42 @@ TEST_F(TestValue, constructFromIntAndGetValueAsInteger)
 {
     auto value = 23;
     auto v = Json::Value(value);
-    EXPECT_EQ(value, v.get<int>());
+    EXPECT_EQ(value, v.get<Json::Integer>());
 }
 
 TEST_F(TestValue, constructFromNegativeIntAndGetValueAsInteger)
 {
     auto value = -23;
     auto v = Json::Value(value);
-    EXPECT_EQ(value, v.get<int>());
+    EXPECT_EQ(value, v.get<Json::Integer>());
+}
+
+TEST_F(TestValue, constructFromLongIntAndGetValueAsInteger)
+{
+    auto value = 25ll;
+    auto v = Json::Value(value);
+    EXPECT_EQ(value, v.get<Json::Integer>());
+}
+
+TEST_F(TestValue, constructFromNegativeLongIntAndGetValueAsInteger)
+{
+    auto value = -25ll;
+    auto v = Json::Value(value);
+    EXPECT_EQ(value, v.get<Json::Integer>());
+}
+
+TEST_F(TestValue, constructFromShortIntAndGetValueAsInteger)
+{
+    int8_t value{20};
+    auto v = Json::Value(value);
+    EXPECT_EQ(value, v.get<Json::Integer>());
+}
+
+TEST_F(TestValue, constructFromNegativeShortIntAndGetValueAsInteger)
+{
+    int8_t value{-20};
+    auto v = Json::Value(value);
+    EXPECT_EQ(value, v.get<Json::Integer>());
 }
 
 TEST_F(TestValue, defaultConstructAndGetValueAsIntThrowsWithHelpfulMessage)
@@ -192,7 +239,7 @@ TEST_F(TestValue, defaultConstructAndGetValueAsIntThrowsWithHelpfulMessage)
     EXPECT_THROW({
         try
         {
-            v.get<int>();
+            v.get<Json::Integer>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
@@ -210,7 +257,7 @@ TEST_F(TestValue, constructFromStringAndGetValueAsIntegerThrowsWithHelpfulMessag
     EXPECT_THROW({
         try
         {
-            v.get<int>();
+            v.get<Json::Integer>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
@@ -229,7 +276,7 @@ TEST_F(TestValue, constructFromFloatAndGetValueAsIntegerThrowsWithHelpfulMessage
     EXPECT_THROW({
         try
         {
-            v.get<int>();
+            v.get<Json::Integer>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
@@ -248,7 +295,7 @@ TEST_F(TestValue, constructFromBoolAndGetValueAsIntegerThrowsWithHelpfulMessage)
     EXPECT_THROW({
         try
         {
-            v.get<int>();
+            v.get<Json::Integer>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
@@ -265,7 +312,14 @@ TEST_F(TestValue, constructFromFloatAndGetValueAsFloat)
 {
     auto value = 23.5f;
     auto v = Json::Value(value);
-    EXPECT_EQ(value, v.get<float>());
+    EXPECT_DOUBLE_EQ(value, v.get<Json::FloatingPoint>());
+}
+
+TEST_F(TestValue, constructFromDoubleAndGetValueAsFloatingPoint)
+{
+    auto value = 23.8;
+    auto v = Json::Value(value);
+    EXPECT_DOUBLE_EQ(value, v.get<Json::FloatingPoint>());
 }
 
 TEST_F(TestValue, defaultConstructAndGetValueAsFloatThrowsWithHelpfulMessage)
@@ -274,7 +328,7 @@ TEST_F(TestValue, defaultConstructAndGetValueAsFloatThrowsWithHelpfulMessage)
     EXPECT_THROW({
         try
         {
-            v.get<float>();
+            v.get<Json::FloatingPoint>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
@@ -292,7 +346,7 @@ TEST_F(TestValue, constructFromStringAndGetValueAsFloatThrowsWithHelpfulMessage)
     EXPECT_THROW({
         try
         {
-            v.get<float>();
+            v.get<Json::FloatingPoint>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
@@ -311,7 +365,7 @@ TEST_F(TestValue, constructFromIntAndGetValueAsFloatThrowsWithHelpfulMessage)
     EXPECT_THROW({
         try
         {
-            v.get<float>();
+            v.get<Json::FloatingPoint>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
@@ -330,7 +384,7 @@ TEST_F(TestValue, constructFromBoolAndGetValueAsFloatThrowsWithHelpfulMessage)
     EXPECT_THROW({
         try
         {
-            v.get<float>();
+            v.get<Json::FloatingPoint>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
@@ -347,7 +401,7 @@ TEST_F(TestValue, constructFromBoolAndGetValueAsBool)
 {
     auto value = true;
     auto v = Json::Value(value);
-    EXPECT_EQ(value, v.get<bool>());
+    EXPECT_EQ(value, v.get<Json::Bool>());
 }
 
 TEST_F(TestValue, defaultConstructAndGetValueAsBoolThrowsWithHelpfulMessage)
@@ -356,7 +410,7 @@ TEST_F(TestValue, defaultConstructAndGetValueAsBoolThrowsWithHelpfulMessage)
     EXPECT_THROW({
         try
         {
-            v.get<bool>();
+            v.get<Json::Bool>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
@@ -374,7 +428,7 @@ TEST_F(TestValue, constructFromStringAndGetValueAsBoolThrowsWithHelpfulMessage)
     EXPECT_THROW({
         try
         {
-            v.get<bool>();
+            v.get<Json::Bool>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
@@ -393,7 +447,7 @@ TEST_F(TestValue, constructFromFloatAndGetValueAsBoolThrowsWithHelpfulMessage)
     EXPECT_THROW({
         try
         {
-            v.get<bool>();
+            v.get<Json::Bool>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {
@@ -412,7 +466,7 @@ TEST_F(TestValue, constructFromIntAndGetValueAsBoolThrowsWithHelpfulMessage)
     EXPECT_THROW({
         try
         {
-            v.get<bool>();
+            v.get<Json::Bool>();
         }
         catch(Json::Value::IncorrectTypeConversion & e)
         {

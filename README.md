@@ -92,6 +92,7 @@ This should be relatively stright forward:
 * For floating points `std::is_float` can be used
 * For bools this should be trivial as (I think!) this should only be `bool`)
 
+Not sure what to do about unsigned integers in the above schema... maybe they should be forbidden at compile time? (Seems like the safest thing...)
 
 ## Future improvements
 

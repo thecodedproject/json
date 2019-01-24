@@ -38,7 +38,7 @@ TEST_F(TestTreeArrayUsage, pushBackStringIntoArrayAndGetValueWithArrayIndexRetur
 {
     auto t = Json::Tree();
     t.pushBack(std::string("some_value"));
-    EXPECT_EQ("some_value", t[0].get<std::string>());
+    EXPECT_EQ("some_value", t[0].get<Json::String>());
 }
 
 TEST_F(TestTreeArrayUsage, defaultConstructAndPushBackElementMakesIsArrayReturnTrue)
@@ -55,10 +55,10 @@ TEST_F(TestTreeArrayUsage, pushBackSeveralValuesIntoArrayAndGetWithArrayIndexRet
     t.pushBack(std::string("some_value"));
     t.pushBack(43);
     t.pushBack(23.5f);
-    EXPECT_EQ(false, t[0].get<bool>());
-    EXPECT_EQ("some_value", t[1].get<std::string>());
-    EXPECT_EQ(43, t[2].get<int>());
-    EXPECT_FLOAT_EQ(23.5f, t[3].get<float>());
+    EXPECT_EQ(false, t[0].get<Json::Bool>());
+    EXPECT_EQ("some_value", t[1].get<Json::String>());
+    EXPECT_EQ(43, t[2].get<Json::Integer>());
+    EXPECT_FLOAT_EQ(23.5f, t[3].get<Json::FloatingPoint>());
 }
 
 TEST_F(TestTreeArrayUsage, tryToAccessArrayIndexOnEmptyTreeThrowsHelpfulError)
@@ -95,11 +95,11 @@ TEST_F(TestTreeArrayUsage, pushBackSeveralValuesIntoArrayAndGetSize)
     t.pushBack(43);
     t.pushBack(subtree_2);
 
-    EXPECT_EQ(14, t[0]["some_int_field"].get<int>());
-    EXPECT_EQ("hello world", t[0]["some_string_field"].get<std::string>());
-    EXPECT_EQ(43, t[1].get<int>());
-    EXPECT_FLOAT_EQ(13.5f, t[2]["some_float_field"].get<float>());
-    EXPECT_EQ(true, t[2]["some_bool_field"].get<bool>());
+    EXPECT_EQ(14, t[0]["some_int_field"].get<Json::Integer>());
+    EXPECT_EQ("hello world", t[0]["some_string_field"].get<Json::String>());
+    EXPECT_EQ(43, t[1].get<Json::Integer>());
+    EXPECT_FLOAT_EQ(13.5f, t[2]["some_float_field"].get<Json::FloatingPoint>());
+    EXPECT_EQ(true, t[2]["some_bool_field"].get<Json::Bool>());
 }
 
 TEST_F(TestTreeArrayUsage, pushBackSeveralValuesIncludingSubtreesIntoArrayAndGetSize)
@@ -196,14 +196,14 @@ TEST_F(TestTreeArrayUsage, assignUsingAccessOperatorAndGetValueGivesCorrectValue
     auto t = Json::Tree();
     t.pushBack(std::string("some_value"));
     t[0] = 123;
-    EXPECT_EQ(123, t[0].get<int>());
+    EXPECT_EQ(123, t[0].get<Json::Integer>());
 }
 
 TEST_F(TestTreeArrayUsage, pushBackStringIntoArrayAndGetValueWithAtReturnsSameValue)
 {
     auto t = Json::Tree();
     t.pushBack(std::string("some_value"));
-    EXPECT_EQ("some_value", t.at(0).get<std::string>());
+    EXPECT_EQ("some_value", t.at(0).get<Json::String>());
 }
 
 TEST_F(TestTreeArrayUsage, getMultipleValuesWithAtAccessorReturnsCorrectValues)
@@ -213,10 +213,10 @@ TEST_F(TestTreeArrayUsage, getMultipleValuesWithAtAccessorReturnsCorrectValues)
     t.pushBack(true);
     t.pushBack(234);
     t.pushBack(23.5f);
-    EXPECT_EQ("some_value", t.at(0).get<std::string>());
-    EXPECT_TRUE(t.at(1).get<bool>());
-    EXPECT_EQ(234, t.at(2).get<int>());
-    EXPECT_FLOAT_EQ(23.5f, t.at(3).get<float>());
+    EXPECT_EQ("some_value", t.at(0).get<Json::String>());
+    EXPECT_TRUE(t.at(1).get<Json::Bool>());
+    EXPECT_EQ(234, t.at(2).get<Json::Integer>());
+    EXPECT_FLOAT_EQ(23.5f, t.at(3).get<Json::FloatingPoint>());
 }
 
 TEST_F(TestTreeArrayUsage, assignUsingAtAccessorAndGetValuesReturnsCorrectValue)
@@ -224,7 +224,7 @@ TEST_F(TestTreeArrayUsage, assignUsingAtAccessorAndGetValuesReturnsCorrectValue)
     auto t = Json::Tree();
     t.pushBack(std::string("some_value"));
     t.at(0) = 345;
-    EXPECT_EQ(345, t.at(0).get<int>());
+    EXPECT_EQ(345, t.at(0).get<Json::Integer>());
 }
 
 TEST_F(TestTreeArrayUsage, getUsingAtAccessorOnConstTreeReturnsCorrectValue)
@@ -232,7 +232,7 @@ TEST_F(TestTreeArrayUsage, getUsingAtAccessorOnConstTreeReturnsCorrectValue)
     auto t = Json::Tree();
     t.pushBack(345);
     auto const& t_const = t;
-    EXPECT_EQ(345, t_const.at(0).get<int>());
+    EXPECT_EQ(345, t_const.at(0).get<Json::Integer>());
 }
 
 TEST_F(TestTreeArrayUsage, constructDocumentAndTryToGetArrayElementWithAtThrowsErrorWithHelpfulMessage)

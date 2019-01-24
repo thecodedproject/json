@@ -49,25 +49,25 @@ TEST_F(TestTreeValueUsage, consturctFromValueAndCallIsValueReturnsTrue)
 TEST_F(TestTreeValueUsage, consturctFromStringAndGetValueAsString)
 {
     auto t = Json::Tree(std::string("something"));
-    EXPECT_EQ("something", t.get<std::string>());
+    EXPECT_EQ("something", t.get<Json::String>());
 }
 
 TEST_F(TestTreeValueUsage, consturctFromFloatAndGetValueAsFloat)
 {
     auto t = Json::Tree(10.5f);
-    EXPECT_FLOAT_EQ(10.5f, t.get<float>());
+    EXPECT_FLOAT_EQ(10.5f, t.get<Json::FloatingPoint>());
 }
 
 TEST_F(TestTreeValueUsage, constructFromIntandGetAsInt)
 {
     auto t = Json::Tree(12);
-    EXPECT_EQ(12, t.get<int>());
+    EXPECT_EQ(12, t.get<Json::Integer>());
 }
 
 TEST_F(TestTreeValueUsage, constructFromBoolAndGetBool)
 {
     auto t = Json::Tree(true);
-    EXPECT_TRUE(t.get<bool>());
+    EXPECT_TRUE(t.get<Json::Bool>());
 }
 
 TEST_F(TestTreeValueUsage, consturctFromValueAndCallIsArrayReturnsFalse)

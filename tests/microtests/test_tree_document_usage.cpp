@@ -49,7 +49,7 @@ TEST_F(TestTreeDocumentUsage, assignStringToFieldOperatorAndGetSameFieldValueAsS
 
     t[field_name] = s;
 
-    EXPECT_EQ(s, t[field_name].get<std::string>());
+    EXPECT_EQ(s, t[field_name].get<Json::String>());
 }
 
 TEST_F(TestTreeDocumentUsage, assignIntToFieldOperatorAndGetSameFieldValueAsIntGivesSameValue)
@@ -60,7 +60,7 @@ TEST_F(TestTreeDocumentUsage, assignIntToFieldOperatorAndGetSameFieldValueAsIntG
 
     t[field_name] = i;
 
-    EXPECT_EQ(i, t[field_name].get<int>());
+    EXPECT_EQ(i, t[field_name].get<Json::Integer>());
 }
 
 TEST_F(TestTreeDocumentUsage, assignFloatToFieldOperatorAndGetSameFieldValueAsFloatGivesSameValue)
@@ -71,7 +71,7 @@ TEST_F(TestTreeDocumentUsage, assignFloatToFieldOperatorAndGetSameFieldValueAsFl
 
     t[field_name] = f;
 
-    EXPECT_FLOAT_EQ(f, t[field_name].get<float>());
+    EXPECT_FLOAT_EQ(f, t[field_name].get<Json::FloatingPoint>());
 }
 
 TEST_F(TestTreeDocumentUsage, assignBoolToFieldOperatorAndGetSameFieldValueAsBoolGivesSameValue)
@@ -82,7 +82,7 @@ TEST_F(TestTreeDocumentUsage, assignBoolToFieldOperatorAndGetSameFieldValueAsBoo
 
     t[field_name] = b;
 
-    EXPECT_EQ(b, t[field_name].get<bool>());
+    EXPECT_EQ(b, t[field_name].get<Json::Bool>());
 }
 
 TEST_F(TestTreeDocumentUsage, assignDifferentValuesToDifferentFieldsAndAccessThemGivesCorrectValues)
@@ -94,10 +94,10 @@ TEST_F(TestTreeDocumentUsage, assignDifferentValuesToDifferentFieldsAndAccessThe
     t["some_bool_field"] = true;
     t["some_float_field"] = 13.5f;
 
-    EXPECT_EQ(14, t["some_int_field"].get<int>());
-    EXPECT_EQ("hello world", t["some_string_field"].get<std::string>());
-    EXPECT_FLOAT_EQ(13.5f, t["some_float_field"].get<float>());
-    EXPECT_EQ(true, t["some_bool_field"].get<bool>());
+    EXPECT_EQ(14, t["some_int_field"].get<Json::Integer>());
+    EXPECT_EQ("hello world", t["some_string_field"].get<Json::String>());
+    EXPECT_FLOAT_EQ(13.5f, t["some_float_field"].get<Json::FloatingPoint>());
+    EXPECT_EQ(true, t["some_bool_field"].get<Json::Bool>());
 }
 
 TEST_F(TestTreeDocumentUsage, getCountOfFieldNameWhichHasBeenAddedReturnsOne)
@@ -177,16 +177,16 @@ TEST_F(TestTreeDocumentUsage, assignSubtreeDocumentWithValuesToFieldAllowsAccess
 
     EXPECT_EQ(
         14,
-        t["some_subtree_field"]["some_int_field"].get<int>());
+        t["some_subtree_field"]["some_int_field"].get<Json::Integer>());
     EXPECT_EQ(
         "hello world",
-        t["some_subtree_field"]["some_string_field"].get<std::string>());
+        t["some_subtree_field"]["some_string_field"].get<Json::String>());
     EXPECT_FLOAT_EQ(
         13.5f,
-        t["some_subtree_field"]["some_float_field"].get<float>());
+        t["some_subtree_field"]["some_float_field"].get<Json::FloatingPoint>());
     EXPECT_EQ(
         true,
-        t["some_subtree_field"]["some_bool_field"].get<bool>());
+        t["some_subtree_field"]["some_bool_field"].get<Json::Bool>());
 }
 
 TEST_F(TestTreeDocumentUsage, defaultConstructAndAssignValueToFieldMakesIsArrayAndIsValueReturnFalse)
@@ -252,7 +252,7 @@ TEST_F(TestTreeDocumentUsage, createDocumentAndAccessValueWithAtAccessor)
 {
     auto t = Json::Tree();
     t["some_field"] = std::string("some_value");
-    EXPECT_EQ("some_value", t.at("some_field").get<std::string>());
+    EXPECT_EQ("some_value", t.at("some_field").get<Json::String>());
 }
 
 TEST_F(TestTreeDocumentUsage, createDocumentAndAccessManyValuesWithAtAccessor)
@@ -263,10 +263,10 @@ TEST_F(TestTreeDocumentUsage, createDocumentAndAccessManyValuesWithAtAccessor)
     t["c"] = false;
     t["d"] = 34.5f;
 
-    EXPECT_EQ("some_value", t.at("a").get<std::string>());
-    EXPECT_EQ(23, t.at("b").get<int>());
-    EXPECT_FALSE(t.at("c").get<bool>());
-    EXPECT_FLOAT_EQ(34.5f, t.at("d").get<float>());
+    EXPECT_EQ("some_value", t.at("a").get<Json::String>());
+    EXPECT_EQ(23, t.at("b").get<Json::Integer>());
+    EXPECT_FALSE(t.at("c").get<Json::Bool>());
+    EXPECT_FLOAT_EQ(34.5f, t.at("d").get<Json::FloatingPoint>());
 }
 
 TEST_F(TestTreeDocumentUsage, createConstDocumentAndAccessValueWithAtAccessor)
@@ -274,7 +274,7 @@ TEST_F(TestTreeDocumentUsage, createConstDocumentAndAccessValueWithAtAccessor)
     auto t = Json::Tree();
     t["some_field"] = std::string("some_value");
     auto const& t_const = t;
-    EXPECT_EQ("some_value", t_const.at("some_field").get<std::string>());
+    EXPECT_EQ("some_value", t_const.at("some_field").get<Json::String>());
 }
 
 TEST_F(TestTreeDocumentUsage, accessFieldWhichDoesNotExistWithAtTHrowsOutOfRange)

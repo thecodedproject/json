@@ -44,13 +44,13 @@ TEST_F(TestTreeIteration, iterateOverDocumentOfValuesGetCorrectFieldsAndValuesAs
     auto it = std::begin(t);
 
     EXPECT_EQ("first_field", it->first);
-    EXPECT_EQ(10, it->second.get<int>());
+    EXPECT_EQ(10, it->second.get<Json::Integer>());
     ++it;
     EXPECT_EQ("second_field", it->first);
-    EXPECT_TRUE(it->second.get<bool>());
+    EXPECT_TRUE(it->second.get<Json::Bool>());
     ++it;
     EXPECT_EQ("thrid_field", it->first);
-    EXPECT_EQ("hello", it->second.get<std::string>());
+    EXPECT_EQ("hello", it->second.get<Json::String>());
     ++it;
     EXPECT_TRUE(it == std::end(t));
 }
@@ -67,13 +67,13 @@ TEST_F(TestTreeIteration, iterateOverConstDocumentOfValuesGetCorrectFieldsAndVal
     auto it = std::begin(t_const);
 
     EXPECT_EQ("first_field", it->first);
-    EXPECT_EQ(10, it->second.get<int>());
+    EXPECT_EQ(10, it->second.get<Json::Integer>());
     ++it;
     EXPECT_EQ("second_field", it->first);
-    EXPECT_TRUE(it->second.get<bool>());
+    EXPECT_TRUE(it->second.get<Json::Bool>());
     ++it;
     EXPECT_EQ("thrid_field", it->first);
-    EXPECT_EQ("hello", it->second.get<std::string>());
+    EXPECT_EQ("hello", it->second.get<Json::String>());
     ++it;
     EXPECT_TRUE(it == std::end(t_const));
 }
@@ -89,13 +89,13 @@ TEST_F(TestTreeIteration,
     auto it = std::cbegin(t);
 
     EXPECT_EQ("first_field", it->first);
-    EXPECT_EQ(10, it->second.get<int>());
+    EXPECT_EQ(10, it->second.get<Json::Integer>());
     ++it;
     EXPECT_EQ("second_field", it->first);
-    EXPECT_TRUE(it->second.get<bool>());
+    EXPECT_TRUE(it->second.get<Json::Bool>());
     ++it;
     EXPECT_EQ("thrid_field", it->first);
-    EXPECT_EQ("hello", it->second.get<std::string>());
+    EXPECT_EQ("hello", it->second.get<Json::String>());
     ++it;
     EXPECT_TRUE(it == std::cend(t));
 }
@@ -113,13 +113,13 @@ TEST_F(TestTreeIteration, iterateOverArrayGivesaCorrectValuesInOrderWithEmptyStr
     auto it = std::begin(t);
 
     EXPECT_TRUE(it->first.empty());
-    EXPECT_EQ(10, it->second.get<int>());
+    EXPECT_EQ(10, it->second.get<Json::Integer>());
     ++it;
     EXPECT_TRUE(it->first.empty());
-    EXPECT_FALSE(it->second.get<bool>());
+    EXPECT_FALSE(it->second.get<Json::Bool>());
     ++it;
     EXPECT_TRUE(it->first.empty());
-    EXPECT_EQ("hello", it->second.get<std::string>());
+    EXPECT_EQ("hello", it->second.get<Json::String>());
     ++it;
     EXPECT_TRUE(it == std::end(t));
 }
@@ -139,13 +139,13 @@ TEST_F(TestTreeIteration, iterateOverConstArrayGivesaCorrectValuesInOrderWithEmp
     auto it = std::begin(t_const);
 
     EXPECT_TRUE(it->first.empty());
-    EXPECT_EQ(10, it->second.get<int>());
+    EXPECT_EQ(10, it->second.get<Json::Integer>());
     ++it;
     EXPECT_TRUE(it->first.empty());
-    EXPECT_FALSE(it->second.get<bool>());
+    EXPECT_FALSE(it->second.get<Json::Bool>());
     ++it;
     EXPECT_TRUE(it->first.empty());
-    EXPECT_EQ("hello", it->second.get<std::string>());
+    EXPECT_EQ("hello", it->second.get<Json::String>());
     ++it;
     EXPECT_TRUE(it == std::end(t_const));
 }
@@ -166,13 +166,13 @@ TEST_F(TestTreeIteration,
     auto it = std::cbegin(t_const);
 
     EXPECT_TRUE(it->first.empty());
-    EXPECT_EQ(10, it->second.get<int>());
+    EXPECT_EQ(10, it->second.get<Json::Integer>());
     ++it;
     EXPECT_TRUE(it->first.empty());
-    EXPECT_FALSE(it->second.get<bool>());
+    EXPECT_FALSE(it->second.get<Json::Bool>());
     ++it;
     EXPECT_TRUE(it->first.empty());
-    EXPECT_EQ("hello", it->second.get<std::string>());
+    EXPECT_EQ("hello", it->second.get<Json::String>());
     ++it;
     EXPECT_TRUE(it == std::cend(t_const));
 }
