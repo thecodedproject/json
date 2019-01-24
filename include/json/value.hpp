@@ -48,7 +48,7 @@ public:
     {
         String,
         Integer,
-        Float,
+        FloatingPoint,
         Bool,
         Null
     };
@@ -103,7 +103,7 @@ Value::Value(T value)
     }
     else if constexpr (std::is_same<T, float>::value)
     {
-        type_ = Type::Float;
+        type_ = Type::FloatingPoint;
         float_value_ = value;
     }
     else if constexpr (std::is_same<T, bool>::value)

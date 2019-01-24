@@ -55,7 +55,7 @@ TEST_F(TestValue, constructFromIntAndGetType)
 TEST_F(TestValue, constructFromFloatAndGetType)
 {
     auto v = Json::Value(2.0f);
-    EXPECT_EQ(Json::Value::Type::Float, v.type());
+    EXPECT_EQ(Json::Value::Type::FloatingPoint, v.type());
 }
 
 TEST_F(TestValue, constructFromBoolAndGetType)
@@ -165,7 +165,7 @@ TEST_F(TestValue, constructFromFloatAndGetValueAsStringThrowsWithHelpfulMessage)
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("2.50"));
-            EXPECT_THAT(err_msg, HasSubstr("Float"));
+            EXPECT_THAT(err_msg, HasSubstr("FloatingPoint"));
             EXPECT_THAT(err_msg, HasSubstr("std::string"));
             throw;
         }
@@ -235,7 +235,7 @@ TEST_F(TestValue, constructFromFloatAndGetValueAsIntegerThrowsWithHelpfulMessage
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("4.50"));
-            EXPECT_THAT(err_msg, HasSubstr("Float"));
+            EXPECT_THAT(err_msg, HasSubstr("FloatingPoint"));
             EXPECT_THAT(err_msg, HasSubstr("int"));
             throw;
         }
@@ -399,7 +399,7 @@ TEST_F(TestValue, constructFromFloatAndGetValueAsBoolThrowsWithHelpfulMessage)
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("34.50"));
-            EXPECT_THAT(err_msg, HasSubstr("Float"));
+            EXPECT_THAT(err_msg, HasSubstr("FloatingPoint"));
             EXPECT_THAT(err_msg, HasSubstr("bool"));
             throw;
         }

@@ -47,8 +47,8 @@ std::string toString(Value::Type type)
             return "Integer";
         case Value::Type::Bool:
             return "Bool";
-        case Value::Type::Float:
-            return "Float";
+        case Value::Type::FloatingPoint:
+            return "FloatingPoint";
         case Value::Type::Null:
             return "Null";
     }
@@ -103,7 +103,7 @@ int Value::get() const
 template <>
 float Value::get() const
 {
-    if(type_ == Type::Float)
+    if(type_ == Type::FloatingPoint)
     {
         return float_value_;
     }

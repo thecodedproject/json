@@ -149,7 +149,7 @@ std::string toJsonText(Value const& v)
                 return "true";
             else
                 return "false";
-        case Value::Type::Float:
+        case Value::Type::FloatingPoint:
             return std::to_string(v.get<float>());
         case Value::Type::Null:
             return "null";
