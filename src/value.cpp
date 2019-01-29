@@ -58,10 +58,7 @@ Value::Value() = default;
 
 bool Value::operator== (Value const& rhs) const
 {
-    return string_value_ == rhs.string_value_ &&
-        float_value_ == rhs.float_value_ &&
-        integer_value_ == rhs.integer_value_ &&
-        bool_value_ == rhs.bool_value_;
+    return value_ == rhs.value_;
 }
 
 bool Value::operator!= (Value const& rhs) const
@@ -79,7 +76,7 @@ String Value::get() const
 {
     if(type_ == Type::String)
     {
-        return string_value_;
+        return std::get<String>(value_);
     }
     else
     {
@@ -92,7 +89,7 @@ Integer Value::get() const
 {
     if(type_ == Type::Integer)
     {
-        return integer_value_;
+        return std::get<Integer>(value_);
     }
     else
     {
@@ -105,7 +102,7 @@ FloatingPoint Value::get() const
 {
     if(type_ == Type::FloatingPoint)
     {
-        return float_value_;
+        return std::get<FloatingPoint>(value_);
     }
     else
     {
@@ -118,7 +115,7 @@ Bool Value::get() const
 {
     if(type_ == Type::Bool)
     {
-        return bool_value_;
+        return std::get<Bool>(value_);
     }
     else
     {

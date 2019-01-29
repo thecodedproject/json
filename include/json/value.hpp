@@ -28,6 +28,7 @@
 #include <string>
 #include <stdexcept>
 #include <type_traits>
+#include <variant>
 
 #include <json/type_defs.hpp>
 
@@ -82,10 +83,7 @@ private:
     std::string objectAsPrintableString() const;
 
     Type type_ = Type::Null;
-    Json::String string_value_ = {};
-    Json::Integer integer_value_ = {};
-    Json::FloatingPoint float_value_ = {};
-    Json::Bool bool_value_ = {};
+    std::variant<String, Integer, FloatingPoint, Bool> value_;
 };
 
 template <typename T>
@@ -96,22 +94,22 @@ Value::Value(T value)
         std::is_same<T, const char *>::value)
     {
         type_ = Type::String;
-        string_value_ = value;
+        value_ = static_cast<String>(value);
     }
     else if constexpr (std::is_same<T, bool>::value)
     {
         type_ = Type::Bool;
-        bool_value_ = value;
+        value_ = value;
     }
     else if constexpr (std::is_integral<T>::value)
     {
         type_ = Type::Integer;
-        integer_value_ = value;
+        value_ = static_cast<Integer>(value);
     }
     else if constexpr (std::is_floating_point<T>::value)
     {
         type_ = Type::FloatingPoint;
-        float_value_ = value;
+        value_ = static_cast<FloatingPoint>(value);
     }
     else
     {
