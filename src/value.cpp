@@ -71,58 +71,6 @@ Value::Type Value::type() const
     return type_;
 }
 
-template <>
-String Value::get() const
-{
-    if(type_ == Type::String)
-    {
-        return std::get<String>(value_);
-    }
-    else
-    {
-        throw IncorrectTypeConversion(*this, "std::string");
-    }
-}
-
-template <>
-Integer Value::get() const
-{
-    if(type_ == Type::Integer)
-    {
-        return std::get<Integer>(value_);
-    }
-    else
-    {
-        throw IncorrectTypeConversion(*this, "int");
-    }
-}
-
-template <>
-FloatingPoint Value::get() const
-{
-    if(type_ == Type::FloatingPoint)
-    {
-        return std::get<FloatingPoint>(value_);
-    }
-    else
-    {
-        throw IncorrectTypeConversion(*this, "float");
-    }
-}
-
-template <>
-Bool Value::get() const
-{
-    if(type_ == Type::Bool)
-    {
-        return std::get<Bool>(value_);
-    }
-    else
-    {
-        throw IncorrectTypeConversion(*this, "bool");
-    }
-}
-
 std::string Value::objectAsPrintableString() const
 {
     return "Value(" +

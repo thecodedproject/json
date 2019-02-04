@@ -109,7 +109,7 @@ TEST_F(TestValue, defaultConstructAndGetValueAsStringThrowsWithHelpfulMessage)
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("Null"));
-            EXPECT_THAT(err_msg, HasSubstr("std::string"));
+            EXPECT_THAT(err_msg, HasSubstr("String"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -128,7 +128,7 @@ TEST_F(TestValue, constructFromIntAndGetValueAsStringThrowsWithHelpfulMessage)
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("10"));
             EXPECT_THAT(err_msg, HasSubstr("Integer"));
-            EXPECT_THAT(err_msg, HasSubstr("std::string"));
+            EXPECT_THAT(err_msg, HasSubstr("String"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -147,7 +147,7 @@ TEST_F(TestValue, constructFromTrueBoolAndGetValueAsStringThrowsWithHelpfulMessa
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("true"));
             EXPECT_THAT(err_msg, HasSubstr("Bool"));
-            EXPECT_THAT(err_msg, HasSubstr("std::string"));
+            EXPECT_THAT(err_msg, HasSubstr("String"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -166,7 +166,7 @@ TEST_F(TestValue, constructFromFalseBoolAndGetValueAsStringThrowsWithHelpfulMess
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("false"));
             EXPECT_THAT(err_msg, HasSubstr("Bool"));
-            EXPECT_THAT(err_msg, HasSubstr("std::string"));
+            EXPECT_THAT(err_msg, HasSubstr("String"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -185,7 +185,7 @@ TEST_F(TestValue, constructFromFloatAndGetValueAsStringThrowsWithHelpfulMessage)
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("2.50"));
             EXPECT_THAT(err_msg, HasSubstr("FloatingPoint"));
-            EXPECT_THAT(err_msg, HasSubstr("std::string"));
+            EXPECT_THAT(err_msg, HasSubstr("String"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -245,7 +245,7 @@ TEST_F(TestValue, defaultConstructAndGetValueAsIntThrowsWithHelpfulMessage)
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("Null"));
-            EXPECT_THAT(err_msg, HasSubstr("int"));
+            EXPECT_THAT(err_msg, HasSubstr("Integer"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -264,7 +264,7 @@ TEST_F(TestValue, constructFromStringAndGetValueAsIntegerThrowsWithHelpfulMessag
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("hello"));
             EXPECT_THAT(err_msg, HasSubstr("String"));
-            EXPECT_THAT(err_msg, HasSubstr("int"));
+            EXPECT_THAT(err_msg, HasSubstr("Integer"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -283,7 +283,7 @@ TEST_F(TestValue, constructFromFloatAndGetValueAsIntegerThrowsWithHelpfulMessage
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("4.50"));
             EXPECT_THAT(err_msg, HasSubstr("FloatingPoint"));
-            EXPECT_THAT(err_msg, HasSubstr("int"));
+            EXPECT_THAT(err_msg, HasSubstr("Integer"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -302,7 +302,7 @@ TEST_F(TestValue, constructFromBoolAndGetValueAsIntegerThrowsWithHelpfulMessage)
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("true"));
             EXPECT_THAT(err_msg, HasSubstr("Bool"));
-            EXPECT_THAT(err_msg, HasSubstr("int"));
+            EXPECT_THAT(err_msg, HasSubstr("Integer"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -334,7 +334,7 @@ TEST_F(TestValue, defaultConstructAndGetValueAsFloatThrowsWithHelpfulMessage)
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("Null"));
-            EXPECT_THAT(err_msg, HasSubstr("float"));
+            EXPECT_THAT(err_msg, HasSubstr("FloatingPoint"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -353,7 +353,7 @@ TEST_F(TestValue, constructFromStringAndGetValueAsFloatThrowsWithHelpfulMessage)
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("eggs"));
             EXPECT_THAT(err_msg, HasSubstr("String"));
-            EXPECT_THAT(err_msg, HasSubstr("float"));
+            EXPECT_THAT(err_msg, HasSubstr("FloatingPoint"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -372,7 +372,7 @@ TEST_F(TestValue, constructFromIntAndGetValueAsFloatThrowsWithHelpfulMessage)
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("13"));
             EXPECT_THAT(err_msg, HasSubstr("Integer"));
-            EXPECT_THAT(err_msg, HasSubstr("float"));
+            EXPECT_THAT(err_msg, HasSubstr("FloatingPoint"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -391,7 +391,7 @@ TEST_F(TestValue, constructFromBoolAndGetValueAsFloatThrowsWithHelpfulMessage)
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("false"));
             EXPECT_THAT(err_msg, HasSubstr("Bool"));
-            EXPECT_THAT(err_msg, HasSubstr("float"));
+            EXPECT_THAT(err_msg, HasSubstr("FloatingPoint"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -416,7 +416,7 @@ TEST_F(TestValue, defaultConstructAndGetValueAsBoolThrowsWithHelpfulMessage)
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("Null"));
-            EXPECT_THAT(err_msg, HasSubstr("bool"));
+            EXPECT_THAT(err_msg, HasSubstr("Bool"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -435,7 +435,7 @@ TEST_F(TestValue, constructFromStringAndGetValueAsBoolThrowsWithHelpfulMessage)
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("coke"));
             EXPECT_THAT(err_msg, HasSubstr("String"));
-            EXPECT_THAT(err_msg, HasSubstr("bool"));
+            EXPECT_THAT(err_msg, HasSubstr("Bool"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -454,7 +454,7 @@ TEST_F(TestValue, constructFromFloatAndGetValueAsBoolThrowsWithHelpfulMessage)
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("34.50"));
             EXPECT_THAT(err_msg, HasSubstr("FloatingPoint"));
-            EXPECT_THAT(err_msg, HasSubstr("bool"));
+            EXPECT_THAT(err_msg, HasSubstr("Bool"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);
@@ -473,7 +473,7 @@ TEST_F(TestValue, constructFromIntAndGetValueAsBoolThrowsWithHelpfulMessage)
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("32"));
             EXPECT_THAT(err_msg, HasSubstr("Integer"));
-            EXPECT_THAT(err_msg, HasSubstr("bool"));
+            EXPECT_THAT(err_msg, HasSubstr("Bool"));
             throw;
         }
     },Json::Value::IncorrectTypeConversion);

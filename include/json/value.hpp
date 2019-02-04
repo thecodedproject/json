@@ -80,11 +80,43 @@ public:
 
 private:
 
+    template <typename T>
+    constexpr Type getType() const;
+
     std::string objectAsPrintableString() const;
 
     Type type_ = Type::Null;
     std::variant<String, Integer, FloatingPoint, Bool> value_;
 };
+
+std::string toString(Value::Type type);
+
+template <typename T>
+constexpr Value::Type Value::getType() const
+{
+    if constexpr (std::is_same<T, String>::value)
+    {
+        return Type::String;
+    }
+    else if constexpr (std::is_same<T, Bool>::value)
+    {
+        return Type::Bool;
+    }
+    else if constexpr (std::is_same<T, Integer>::value)
+    {
+        return Type::Integer;
+    }
+    else if constexpr (std::is_same<T, FloatingPoint>::value)
+    {
+        return Type::FloatingPoint;
+    }
+    else
+    {
+        static_assert(
+            DependentFalse<T>::value,
+            "Value::getType(): Not a Json type");
+    }
+}
 
 template <typename T>
 Value::Value(T value)
@@ -93,23 +125,23 @@ Value::Value(T value)
         std::is_same<T, std::string>::value ||
         std::is_same<T, const char *>::value)
     {
-        type_ = Type::String;
         value_ = static_cast<String>(value);
+        type_ = Type::String;
     }
-    else if constexpr (std::is_same<T, bool>::value)
+    else if constexpr (std::is_same<T, Bool>::value)
     {
-        type_ = Type::Bool;
         value_ = value;
+        type_ = Type::Bool;
     }
     else if constexpr (std::is_integral<T>::value)
     {
-        type_ = Type::Integer;
         value_ = static_cast<Integer>(value);
+        type_ = Type::Integer;
     }
     else if constexpr (std::is_floating_point<T>::value)
     {
-        type_ = Type::FloatingPoint;
         value_ = static_cast<FloatingPoint>(value);
+        type_ = Type::FloatingPoint;
     }
     else
     {
@@ -117,7 +149,19 @@ Value::Value(T value)
     }
 }
 
-std::string toString(Value::Type type);
+template <typename T>
+T Value::get() const
+{
+    auto requested_type = getType<T>();
+    if(type_ == requested_type)
+    {
+        return std::get<T>(value_);
+    }
+    else
+    {
+        throw IncorrectTypeConversion(*this, toString(requested_type));
+    }
+}
 
 }
 }
