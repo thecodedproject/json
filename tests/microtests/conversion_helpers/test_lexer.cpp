@@ -40,8 +40,8 @@ protected:
     void expectEq(Token const& expectedToken, Token const& actualToken)
     {
         EXPECT_EQ(expectedToken, actualToken) <<
-            "Expected: " << toString(expectedToken) <<
-            "\nActual: " << toString(actualToken);
+            "Expected: " << toDebugString(expectedToken) <<
+            "\nActual: " << toDebugString(actualToken);
     }
 
     void expectNextTokenEq(Token const& expectedToken, Lexer & lexer)
@@ -416,7 +416,7 @@ TEST_F(TestConversionHelpersLexer,
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("line 1, column 1"));
-            EXPECT_THAT(err_msg, HasSubstr(toString(expected_token)));
+            EXPECT_THAT(err_msg, HasSubstr(toDebugString(expected_token)));
             EXPECT_THAT(err_msg, HasSubstr("'123'"));
             throw;
         }
@@ -438,7 +438,7 @@ TEST_F(TestConversionHelpersLexer,
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("line 1, column 1"));
-            EXPECT_THAT(err_msg, HasSubstr(toString(expected_token)));
+            EXPECT_THAT(err_msg, HasSubstr(toDebugString(expected_token)));
             EXPECT_THAT(err_msg, HasSubstr("'\"hello\"'"));
             throw;
         }
@@ -460,7 +460,7 @@ TEST_F(TestConversionHelpersLexer,
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("line 1, column 1"));
-            EXPECT_THAT(err_msg, HasSubstr(toString(expected_token)));
+            EXPECT_THAT(err_msg, HasSubstr(toDebugString(expected_token)));
             EXPECT_THAT(err_msg, HasSubstr("'1245'"));
             throw;
         }
@@ -482,7 +482,7 @@ TEST_F(TestConversionHelpersLexer,
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("line 1, column 4"));
-            EXPECT_THAT(err_msg, HasSubstr(toString(expected_token)));
+            EXPECT_THAT(err_msg, HasSubstr(toDebugString(expected_token)));
             EXPECT_THAT(err_msg, HasSubstr("'1245'"));
             throw;
         }
@@ -504,7 +504,7 @@ TEST_F(TestConversionHelpersLexer,
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("line 4, column 6"));
-            EXPECT_THAT(err_msg, HasSubstr(toString(expected_token)));
+            EXPECT_THAT(err_msg, HasSubstr(toDebugString(expected_token)));
             EXPECT_THAT(err_msg, HasSubstr("'1245'"));
             throw;
         }
@@ -528,7 +528,7 @@ TEST_F(TestConversionHelpersLexer,
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("line 1, column 12"));
-            EXPECT_THAT(err_msg, HasSubstr(toString(expected_token)));
+            EXPECT_THAT(err_msg, HasSubstr(toDebugString(expected_token)));
             EXPECT_THAT(err_msg, HasSubstr("','"));
             throw;
         }
@@ -552,7 +552,7 @@ TEST_F(TestConversionHelpersLexer,
         {
             auto err_msg = e.what();
             EXPECT_THAT(err_msg, HasSubstr("line 3, column 1"));
-            EXPECT_THAT(err_msg, HasSubstr(toString(expected_token)));
+            EXPECT_THAT(err_msg, HasSubstr(toDebugString(expected_token)));
             EXPECT_THAT(err_msg, HasSubstr("'\"close_doc\"'"));
             throw;
         }

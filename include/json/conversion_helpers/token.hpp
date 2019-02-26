@@ -45,8 +45,8 @@ struct Token
     bool operator==(Token const& rhs) const;
 };
 
-std::string toString(TokenType const& type);
-std::string toString(Token const& token);
+std::string toDebugString(TokenType const& type);
+std::string toDebugString(Token const& token);
 
 }
 }

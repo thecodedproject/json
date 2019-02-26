@@ -45,7 +45,7 @@ public:
     {
         return ParseError(
             "Expected " +
-            toString(expected_token_type) + " but got token"
+            toDebugString(expected_token_type) + " but got token"
             " '" + actual_token_string + "'",
             error_line_and_column);
     }

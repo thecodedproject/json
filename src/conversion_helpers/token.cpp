@@ -38,7 +38,7 @@ bool Token::operator==(Token const& rhs) const
         value == rhs.value;
 }
 
-std::string toString(TokenType const& type)
+std::string toDebugString(TokenType const& type)
 {
     switch(type)
     {
@@ -65,13 +65,13 @@ std::string toString(TokenType const& type)
     }
 }
 
-std::string toString(Token const& token)
+std::string toDebugString(Token const& token)
 {
     if(token.type == TokenType::Value ||
         token.type == TokenType::StringValue)
     {
         return "Token("
-            + toString(token.type)
+            + toDebugString(token.type)
             + ", "
             + toDebugString(token.value)
             + ")";
@@ -79,7 +79,7 @@ std::string toString(Token const& token)
     else
     {
         return "Token("
-            + toString(token.type)
+            + toDebugString(token.type)
             + ")";
 
     }

@@ -167,7 +167,7 @@ std::string toJsonText(Token const& t)
         case TokenType::StartOfFile:
             throw std::runtime_error(
                 "ConversionHelpers::toJsonText(Token): Token" +
-                toString(t.type) + " is not JSON serialisable.");
+                toDebugString(t.type) + " is not JSON serialisable.");
         default:
             return toJsonText(t.type);
     }
@@ -195,7 +195,7 @@ std::string toJsonText(TokenType const& type)
         case TokenType::StartOfFile:
             throw std::runtime_error(
                 "ConversionHelpers::toJsonText(TokenType): Token type" +
-                toString(type) + " cannot be converted to JSON without value.");
+                toDebugString(type) + " cannot be converted to JSON without value.");
     }
 }
 
