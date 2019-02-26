@@ -32,12 +32,12 @@ namespace CodedProject
 namespace Json
 {
 
-std::string toString(Value const& v)
+std::string toDebugString(Value const& v)
 {
     return v.objectAsPrintableString();
 }
 
-std::string toString(Value::Type type)
+std::string toDebugString(Value::Type type)
 {
     switch(type)
     {
@@ -75,7 +75,7 @@ std::string Value::objectAsPrintableString() const
 {
     return "Value(" +
         ConversionHelpers::toJsonText(*this) + "," +
-        toString(type()) + ")";
+        toDebugString(type()) + ")";
 }
 
 }

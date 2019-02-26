@@ -41,11 +41,11 @@ template<class T> struct DependentFalse : std::false_type {};
 
 class Value;
 
-std::string toString(Value const& v);
+std::string toDebugString(Value const& v);
 
 class Value
 {
-friend std::string toString(Value const&);
+friend std::string toDebugString(Value const&);
 public:
     enum class Type
     {
@@ -89,7 +89,7 @@ private:
     std::variant<String, Integer, FloatingPoint, Bool> value_;
 };
 
-std::string toString(Value::Type type);
+std::string toDebugString(Value::Type type);
 
 template <typename T>
 constexpr Value::Type Value::getType() const
@@ -159,7 +159,7 @@ T Value::get() const
     }
     else
     {
-        throw IncorrectTypeConversion(*this, toString(requested_type));
+        throw IncorrectTypeConversion(*this, toDebugString(requested_type));
     }
 }
 

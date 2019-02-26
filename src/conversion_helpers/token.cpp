@@ -73,7 +73,7 @@ std::string toString(Token const& token)
         return "Token("
             + toString(token.type)
             + ", "
-            + toString(token.value)
+            + toDebugString(token.value)
             + ")";
     }
     else
