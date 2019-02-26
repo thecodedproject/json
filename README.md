@@ -51,6 +51,8 @@ Builder?
 };
 ```
 
+# General design decisions
+
 ## Improvements over Boost ptree (for the desired purpose of representing JSON, which is not what Boost ptree is meant for!):
 
 * Preserves type information of the stored values.
@@ -94,18 +96,18 @@ This should be relatively stright forward:
 
 Not sure what to do about unsigned integers in the above schema... maybe they should be forbidden at compile time? (Seems like the safest thing...)
 
-## Future improvements
+## toString methods
+
+Only 1 single `toString` method exists in the `Json` namespace (and it's sub-namespaces) - this converts a tree object to a json string.
+All other methods used for debugging are named `toDebugString`.
+
+
+# Future improvements
 
 
 ### Allow adding trees with builder; i.e. pushBack(Tree), append("...", Tree), concat(Tree)...
 
 ### Better way to consturct null tree/value (connected with the potentially dodgey template, catch-all constuctor)
-
-### Muddy `toString` statements
-
-There are alot of toString overloads in the `CodedProject::Json` namespace - I feel like they should all do the same thing probably: convert the object to Json (if applicable).
-However some, namely `toString(Value)` converts to a printable string showing the type, not to JSON.
-Potentially rethink this design?
 
 ### Order independent comparison (of documents) and sort functions (for documents only)
 
