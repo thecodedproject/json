@@ -162,7 +162,7 @@ T Tree::get() const
     return value_.get<T>();
 }
 
-std::string toString(Tree::Type type);
+std::string toDebugString(Tree::Type type);
 
 }
 }

@@ -259,7 +259,7 @@ Value const& Tree::getValue() const
 
 std::string Tree::typeAsString() const
 {
-    return toString(type_);
+    return toDebugString(type_);
 }
 
 bool Tree::isNotDocument() const
@@ -295,13 +295,13 @@ void Tree::throwIncorrectCallIfPredicate(
     if(pred())
     {
         throw IncorrectCallForType(
-            toString(function_allowed_type) +
+            toDebugString(function_allowed_type) +
                 "function `" + function_signature + "`",
             typeAsString());
     }
 }
 
-std::string toString(Tree::Type type)
+std::string toDebugString(Tree::Type type)
 {
     switch(type)
     {
